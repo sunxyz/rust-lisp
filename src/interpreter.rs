@@ -27,9 +27,9 @@ pub fn interpreter(exp: List, env: &mut Env) -> LispType {
     println!("cdr: {} is-exp:{}", cdr, cdr.is_expr());
     match car {
         Symbol(key) => {
-            let value = env.get(&key);
+            let value = env.get(&key, true);
             let v = env
-                .get(key.as_str())
+                .get(key.as_str(),true)
                 .expect(format!("undefined symbol: {}", key).as_str());
             if let Procedure(f) = v.clone() {
                 if (exp.is_expr()) {
@@ -93,7 +93,7 @@ fn apply(
 fn interpreter0(o: &LispType, env: &mut Env) -> LispType {
     match o {
         Expr(l) => interpreter(l.clone(), env),
-        Symbol(s) => env.get(s.as_str()).unwrap(),
+        Symbol(s) => env.get(s.as_str(),true).expect(format!("undefined symbol {}", s.as_str()).as_str()),
         _ => o.clone(),
     }
 }

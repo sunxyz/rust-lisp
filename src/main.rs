@@ -42,7 +42,7 @@ fn main() {
     // println!("{}", r);
     // println!("{}", r.cdr());
 
-    let r = eval("( (define a (lambda (x) (+ x 8))) (a 8))");
+    let r = eval("( (define a (lambda (x) (+ x 8))) (a 8) x)");
     println!("{}", r.ok().unwrap());
 
     // let mut j = [1] ;

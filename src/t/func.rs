@@ -1,5 +1,7 @@
 use super::*;
 use crate::env::Env;
+use std::cell::RefCell;
+use std::rc::Rc;
 
 pub struct Func {
     pub name: String,
@@ -78,6 +80,11 @@ impl<'a> ApplyArgs<'a> {
     pub fn inter(&mut self, exp: &LispType) -> LispType {
         let e: fn(&LispType, &mut Env) -> LispType = self.inter;
         e(exp, self.env)
+    }
+
+    pub fn inter_4_env(&mut self, exp: &LispType, env: Rc<RefCell<Env>>) -> LispType {
+        let e: fn(&LispType, &mut Env) -> LispType = self.inter;
+        e(exp, &mut env.borrow_mut())
     }
 
     pub fn env(&mut self) -> &mut Env {

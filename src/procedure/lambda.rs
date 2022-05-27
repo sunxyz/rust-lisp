@@ -1,8 +1,11 @@
 use super::*;
+
 fn lambda(apply_args: &mut ApplyArgs) -> Box<dyn Fn(&mut ApplyArgs) -> LispType> {
     if let Expr(args) = apply_args.expr().car() {
         let body = Expr(apply_args.expr().cdr());
         Box::new(move |x| {
+            println!("lambda: {}", x.env());
+            let env = x.env().fork();
             bind_args(args.clone(), x.args().clone(), x.env());
             x.inter(&body)
         })
