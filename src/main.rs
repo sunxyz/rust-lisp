@@ -42,7 +42,7 @@ fn main() {
     // println!("{}", r);
     // println!("{}", r.cdr());
 
-    let r = eval("((define a 10)(+ a 1 2 3 5 6 7  (15) (- 0 1 2 3 5 6 7 (10))))");
+    let r = eval("( (define a (lambda (x) (+ x 8))) (a 8))");
     println!("{}", r.ok().unwrap());
 
     // let mut j = [1] ;
@@ -64,75 +64,4 @@ fn main() {
     // let tr = &mut ts[..];
     // rs(tr);
     // println!("{}", tr);
-}
-
-//
-use t::LispType;
-
-pub trait EnvOption {
-    fn get(&self, key: &str) -> Option<LispType>;
-    fn set(&mut self, key: &str, value: LispType);
-    fn fork(&self) -> Rc<RefCell<Env>>;
-}
-
-pub enum Env {
-    Empty,
-    Extend(Rc<RefCell<EnvContainer>>),
-}
-
-impl EnvOption for Env {
-    fn fork(&self) -> Rc<RefCell<Env>> {
-        match self {
-            Env::Extend(frame) => frame.borrow_mut().fork(),
-            _ => panic!("fork on empty env"),
-        }
-    }
-    fn get(&self, key: &str) -> Option<LispType> {
-        match self {
-            Env::Empty => None,
-            Env::Extend(frame) => frame.borrow_mut().get(key),
-        }
-    }
-    fn set(&mut self, key: &str, value: LispType) {
-        match self {
-            Env::Empty => panic!("set on empty env"),
-            Env::Extend(frame) => frame.borrow_mut().set(key, value),
-        }
-    }
-}
-
-pub struct EnvContainer {
-    parent: Rc<RefCell<Env>>,
-    env: HashMap<String, LispType>,
-    self_: Rc<RefCell<Env>>,
-}
-
-impl EnvContainer {
-    pub fn new(parent: Rc<RefCell<Env>>) -> Rc<RefCell<Env>> {
-        let f = EnvContainer {
-            parent: parent,
-            env: HashMap::new(),
-            self_: Rc::new(RefCell::new(Env::Empty)),
-        };
-        let self_ = Rc::new(RefCell::new(f));
-        let env = Env::Extend(self_.clone());
-        let self_ = Rc::new(RefCell::new(env));
-        self_.clone()
-    }
-}
-
-impl EnvOption for EnvContainer {
-    fn fork(&self) -> Rc<RefCell<Env>> {
-        Self::new(self.self_.clone())
-    }
-    fn get(&self, key: &str) -> Option<LispType> {
-        if self.env.contains_key(key) {
-            Some(self.env[key].clone())
-        } else {
-            self.parent.borrow_mut().get(key)
-        }
-    }
-    fn set(&mut self, key: &str, value: LispType) {
-        self.env.insert(key.to_string(), value);
-    }
 }

@@ -4,8 +4,10 @@ mod func;
 use std::fmt::Display;
 use std::fmt::Formatter;
 use std::fmt::Result;
+use std::rc::Rc;
 
 pub use self::func::ApplyArgs;
+pub use self::func::Func;
 pub use self::list::List;
 
 pub enum LispType {
@@ -16,9 +18,10 @@ pub enum LispType {
     Char(char),
     Nil,
     Expr(List),
-    Procedure(fn(&mut ApplyArgs) -> LispType),
+    Procedure(Rc<Box<dyn Fn(&mut ApplyArgs)-> LispType>>),
     // Cons(Cons)
 }
+
 
 impl Clone for LispType{
     fn clone(&self) -> Self {
@@ -30,11 +33,12 @@ impl Clone for LispType{
             LispType::Char(c) => LispType::Char(*c),
             LispType::Nil => LispType::Nil,
             LispType::Expr(l) => LispType::Expr(l.clone()),
-            LispType::Procedure(f) => LispType::Procedure(*f),
+            LispType::Procedure(f) => LispType::Procedure(f.clone()),
             // LispType::Cons(c) => LispType::Cons(c.clone()),
         }
     }
 }
+
 
 impl Display for LispType {
     fn fmt(&self, f: &mut Formatter) -> Result {

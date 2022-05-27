@@ -21,7 +21,7 @@ impl List {
     }
 
     pub fn cdr(&self) -> List {
-        List(self.0[1..].to_vec(), ListType::EXPR)
+        List(self.0[1..].to_vec(), ListType::SUB)
     }
 
     pub fn is_nil(&self) -> bool {

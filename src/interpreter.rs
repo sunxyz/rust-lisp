@@ -1,7 +1,8 @@
+use std::rc::Rc;
 use crate::t::{
     ApplyArgs,
     LispType::{self, *},
-    List,
+    List, Func,
 };
 
 // use super::t::*;
@@ -23,14 +24,14 @@ pub fn interpreter(exp: List, env: &mut Env) -> LispType {
     let car = exp.car();
     println!("car: {}", car);
     let cdr = exp.cdr();
-    println!("cdr: {}", cdr);
+    println!("cdr: {} is-exp:{}", cdr, cdr.is_expr());
     match car {
         Symbol(key) => {
             let value = env.get(&key);
             let v = env
                 .get(key.as_str())
                 .expect(format!("undefined symbol: {}", key).as_str());
-            if let Procedure(f) = v {
+            if let Procedure(f) = v.clone() {
                 if (exp.is_expr()) {
                     println!("exc: {}", cdr);
                     return apply(f, cdr, env, None);
@@ -44,9 +45,9 @@ pub fn interpreter(exp: List, env: &mut Env) -> LispType {
         }
         Expr(l) => {
             let v = interpreter(l, env);
-            if let Procedure(f) = v {
+            if let Procedure(f) = v.clone() {
                 if (exp.is_expr()) {
-                    println!("exc: {}", cdr);
+                    println!("exc0: {}", cdr);
                     return apply(f, cdr, env, None);
                 }
             }
@@ -67,7 +68,7 @@ pub fn interpreter(exp: List, env: &mut Env) -> LispType {
 }
 
 fn apply(
-    f: fn(&mut ApplyArgs) -> LispType,
+    f: Rc<Box<dyn Fn(&mut ApplyArgs)->LispType>>,//Func,//fn(&mut ApplyArgs) -> LispType,
     cdr: List,
     env: &mut Env,
     args: Option<List>,
