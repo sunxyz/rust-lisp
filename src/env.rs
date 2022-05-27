@@ -1,98 +1,90 @@
 use super::t::*;
-use std::{cell::RefCell, cell::RefMut, collections::HashMap, rc::Rc};
+use std::cell::RefCell;
+use std::collections::HashMap;
+use std::rc::Rc;
 
-pub enum EnvType {
-    E(Env),
-    None,
+pub trait EnvOption {
+    fn get(&self, key: &str) -> Option<LispType>;
+    fn set(&mut self, key: &str, value: LispType);
+    fn fork(&self) -> Rc<RefCell<Env>>;
 }
 
-impl EnvType {
-    pub fn new_rc() -> Rc<RefCell<Self>> {
-        Rc::new(RefCell::new(EnvType::E(Env {
-            env: HashMap::new(),
-            parent: Rc::new(RefCell::new(EnvType::None)),
-        })))
-    }
-    pub fn extend(&mut self) -> Rc<RefCell<EnvType>> {
-        match self {
-            EnvType::E(env) => env.extend(),
-            EnvType::None => {
-                panic!("extend on None")
-            }
-        }
-    }
-    pub fn set(&mut self, key: &str, value: LispType) {
-        match self {
-            EnvType::E(env) => {
-                env.set(key, value);
-            }
-            EnvType::None => {}
-        }
-    }
-    pub fn get(&self, key: &str) -> Option<LispType> {
-        match self {
-            EnvType::E(env) => env.get(key),
-            EnvType::None => None,
-        }
-    }
-
-    pub fn set_parent(&mut self, parent: Rc<RefCell<EnvType>>) {
-        match self {
-            EnvType::E(env) => {
-                env.set_parent(parent);
-            }
-            EnvType::None => {}
-        }
-    }
-    pub fn env(&self, key: &str) -> Option<LispType> {
-        match self {
-            EnvType::E(env) => env.get(key),
-            EnvType::None => None,
-        }
-    }
-}
-
-
-pub struct Env {
-    env: HashMap<String, LispType>,
-    parent: Rc<RefCell<EnvType>>,
+pub enum Env {
+    Empty,
+    Extend(Rc<RefCell<EnvContainer>>),
 }
 
 impl Env {
-    pub fn new() -> Self {
-        Env {
-            env: HashMap::new(),
-            parent: Rc::new(RefCell::new(EnvType::None)),
+    pub fn new() -> Rc<RefCell<Env>> {
+        EnvContainer::new(Rc::new(RefCell::new(Env::Empty)))
+    }
+    fn set_self(&mut self, _self: Rc<RefCell<Env>>) {
+        match self {
+            Env::Extend(frame) => frame.borrow_mut().set_self(_self),
+            _ => panic!("set_self on empty env"),
         }
     }
+}
 
-    fn new0() -> Rc<RefCell<EnvType>> {
-        Rc::new(RefCell::new(EnvType::E(Env::new())))
+impl EnvOption for Env {
+    fn fork(&self) -> Rc<RefCell<Env>> {
+        match self {
+            Env::Extend(frame) => frame.borrow_mut().fork(),
+            _ => panic!("fork on empty env"),
+        }
     }
-
-    pub fn extend(&self) -> Rc<RefCell<EnvType>> {
-        let env = Env::new0();
-        env.borrow_mut().set_parent(self.parent.clone());
-        env
+    fn get(&self, key: &str) -> Option<LispType> {
+        match self {
+            Env::Extend(frame) => frame.borrow_mut().get(key),
+            _ => None,
+        }
     }
-
-    pub fn reg_procedure(&mut self, key: &str, f: fn(&mut ApplyArgs) -> LispType) {
-        self.set(key, LispType::Procedure(f));
+    fn set(&mut self, key: &str, value: LispType) {
+        match self {
+            Env::Extend(frame) => frame.borrow_mut().set(key, value),
+            _ => panic!("set on empty env"),
+        }
     }
+    
+}
 
-    pub fn set(&mut self, key: &str, value: LispType) {
-        self.env.insert(key.to_string(), value);
+pub struct EnvContainer {
+    parent: Rc<RefCell<Env>>,
+    env: HashMap<String, LispType>,
+    _self: Rc<RefCell<Env>>,
+}
+
+impl EnvContainer {
+    pub fn new(parent: Rc<RefCell<Env>>) -> Rc<RefCell<Env>> {
+        let f = EnvContainer {
+            parent: parent,
+            env: HashMap::new(),
+            _self: Rc::new(RefCell::new(Env::Empty)),
+        };
+        let _self = Rc::new(RefCell::new(f));
+        let env = Env::Extend(_self.clone());
+        let r = _self.clone();
+        let _self = Rc::new(RefCell::new(env));
+        _self.borrow_mut().set_self(_self.clone());
+        _self
     }
+    fn set_self(&mut self, _self: Rc<RefCell<Env>>) {
+        self._self = _self;
+    }
+}
 
-    pub fn get(&self, key: &str) -> Option<LispType> {
+impl EnvOption for EnvContainer {
+    fn fork(&self) -> Rc<RefCell<Env>> {
+        Self::new(self._self.clone())
+    }
+    fn get(&self, key: &str) -> Option<LispType> {
         if self.env.contains_key(key) {
             Some(self.env[key].clone())
         } else {
-            self.parent.borrow_mut().env(key)
+            self.parent.borrow_mut().get(key)
         }
     }
-
-    pub fn set_parent(&mut self, parent: Rc<RefCell<EnvType>>) {
-        self.parent = parent;
+    fn set(&mut self, key: &str, value: LispType) {
+        self.env.insert(key.to_string(), value);
     }
 }

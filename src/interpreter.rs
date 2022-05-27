@@ -3,18 +3,20 @@ use crate::t::{
     LispType::{self, *},
     List,
 };
+
 // use super::t::*;
 use super::env::Env;
+use super::env::EnvOption;
 use super::parse::parse;
 use super::procedure::init_procedure;
 
 pub fn eval(exp: &'static str) -> Result<LispType, &str> {
-    let mut root = Env::new();
-    init_procedure(&mut root);
-    // let mut env = Env::new();
-    // // env.set_parent(&'static mut root);
+    let root = Env::new();
+    init_procedure(&mut root.borrow_mut());
+    let env = root.borrow_mut().fork();
     let exp = parse(exp).unwrap();
-    Ok(interpreter(exp, &mut root))
+    let r = interpreter(exp, &mut env.borrow_mut());
+    Ok(r)
 }
 
 pub fn interpreter(exp: List, env: &mut Env) -> LispType {
@@ -24,7 +26,7 @@ pub fn interpreter(exp: List, env: &mut Env) -> LispType {
     println!("cdr: {}", cdr);
     match car {
         Symbol(key) => {
-           
+            let value = env.get(&key);
             let v = env
                 .get(key.as_str())
                 .expect(format!("undefined symbol: {}", key).as_str());

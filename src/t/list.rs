@@ -4,14 +4,12 @@ use std::fmt::Display;
 use std::fmt::Formatter;
 use std::fmt::Result;
 
-
-pub enum ListType {
+enum ListType {
     SUB,
     EXPR,
 }
+
 pub struct List(Vec<LispType>, ListType);
-
-
 
 impl List {
     pub fn new() -> Self {
@@ -22,7 +20,7 @@ impl List {
         self.0[0].clone()
     }
 
-    pub fn cdr(& self) -> List {
+    pub fn cdr(&self) -> List {
         List(self.0[1..].to_vec(), ListType::EXPR)
     }
 
@@ -46,7 +44,7 @@ impl List {
         }
     }
 
-    pub fn push(&mut self, elem:  LispType) {
+    pub fn push(&mut self, elem: LispType) {
         self.0.push(elem);
     }
 
@@ -57,13 +55,10 @@ impl List {
     pub fn data(&self) -> &Vec<LispType> {
         &self.0
     }
-
 }
 
-impl Copy for ListType{
-   
-}
-impl Clone for ListType{
+impl Copy for ListType {}
+impl Clone for ListType {
     fn clone(&self) -> Self {
         match self {
             ListType::EXPR => ListType::EXPR,
@@ -71,19 +66,27 @@ impl Clone for ListType{
         }
     }
 }
-    
 
-impl  Display for List {
+
+impl Display for List {
     fn fmt(&self, f: &mut Formatter) -> Result {
-        write!(f, "({})", self.0.iter().map(|x| x.to_string()).collect::<Vec<String>>().join(" "))
+        write!(
+            f,
+            "({})",
+            self.0
+                .iter()
+                .map(|x| x.to_string())
+                .collect::<Vec<String>>()
+                .join(" ")
+        )
     }
 }
 
 impl Clone for List {
     fn clone(&self) -> Self {
         let mut v = Vec::new();
-        for i in self.0.iter(){
-           v.push(i.clone());
+        for i in self.0.iter() {
+            v.push(i.clone());
         }
         List(v, self.1)
     }
