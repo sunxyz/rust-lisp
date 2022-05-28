@@ -1,7 +1,7 @@
 use super::*;
 
 fn quote(apply_args: &mut ApplyArgs) -> LispType {
-    Expr(apply_args.expr().clone())
+    apply_args.expr().car()
 }
 
 pub fn reg_procedure(env: &mut Env) {

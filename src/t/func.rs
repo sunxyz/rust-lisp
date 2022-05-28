@@ -60,7 +60,12 @@ impl<'a> ApplyArgs<'a> {
     pub fn apply(&mut self) -> LispType {
         let args = self.args();
         if let Procedure(f) = args.car() {
-            let args = args.cdr();
+            let mut args = args.cdr();
+            if let Expr(a) = args.car() {
+                if(args.data().len()==1){
+                    args=a;
+                }
+            } 
             self.args = Some(args);
             f(self)
         } else {

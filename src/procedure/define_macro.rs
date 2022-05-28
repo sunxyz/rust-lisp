@@ -7,14 +7,17 @@ fn define_macro(apply_args: &mut ApplyArgs) -> LispType {
     }
     if let Symbol(var) = list.car() {
         let proc = list.cdr().car();
+        println!("define-macro: {}", var);
         if let Procedure(_) = apply_args.inter(&proc) {
+           
             apply_args.env().define(
                 &var,
                 Procedure(Rc::new(Box::new(move |x| {
                     let mut expr = List::new();
                     let mut args = List::new();
                     args.push_all(vec![Symbol("'".to_string()), Expr(x.expr().clone())]);
-                    expr.push_all(vec![Symbol("apply".to_string()), proc.clone(), Expr(args)]);
+                    expr.push_all(vec![Symbol("apply".to_string()), proc.clone(), Expr(args.clone())]);
+                    println!("define-macro: {} => {}", args, expr);
                     x.inter(&Expr(expr))
                 }))),
             );
