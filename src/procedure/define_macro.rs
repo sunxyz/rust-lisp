@@ -11,10 +11,10 @@ fn define_macro(apply_args: &mut ApplyArgs) -> LispType {
             apply_args.env().define(
                 &var,
                 Procedure(Rc::new(Box::new(move |x| {
-                    let expr = List::new();
-                    let args = List::new();
+                    let mut expr = List::new();
+                    let mut args = List::new();
                     args.push_all(vec![Symbol("'".to_string()), Expr(x.expr().clone())]);
-                    list.push_all(vec![Symbol("apply".to_string()), proc, Expr(args)]);
+                    expr.push_all(vec![Symbol("apply".to_string()), proc.clone(), Expr(args)]);
                     x.inter(&Expr(expr))
                 }))),
             );
