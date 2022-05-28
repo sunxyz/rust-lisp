@@ -16,9 +16,7 @@ mod parse;
 mod procedure;
 mod t;
 use interpreter::eval;
-use std::cell::RefCell;
-use std::collections::HashMap;
-use std::rc::Rc;
+use t::LispType;
 fn main() {
     // let s = Rc::new(RefCell::new("我很善变，还拥有多个主人".to_string()));
 
@@ -42,7 +40,7 @@ fn main() {
     // println!("{}", r);
     // println!("{}", r.cdr());
 
-    let r = eval("( (define a (lambda (x) (+ x 8))) (a 8) x)");
+    let r = eval("( (define a (lambda (x) (+ x 8))) (a 8))");
     println!("{}", r.ok().unwrap());
 
     // let mut j = [1] ;
@@ -65,3 +63,5 @@ fn main() {
     // rs(tr);
     // println!("{}", tr);
 }
+
+

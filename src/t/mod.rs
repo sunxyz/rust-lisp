@@ -7,7 +7,6 @@ use std::fmt::Result;
 use std::rc::Rc;
 
 pub use self::func::ApplyArgs;
-pub use self::func::Func;
 pub use self::list::List;
 
 pub enum LispType {

@@ -4,17 +4,18 @@ fn lambda(apply_args: &mut ApplyArgs) -> Box<dyn Fn(&mut ApplyArgs) -> LispType>
     if let Expr(args) = apply_args.expr().car() {
         let body = Expr(apply_args.expr().cdr());
         Box::new(move |x| {
-            println!("lambda: {}", x.env());
-            let env = x.env().fork();
+            x.env().fork();
             bind_args(args.clone(), x.args().clone(), x.env());
-            x.inter(&body)
+            let v = x.inter(&body);
+            x.env().kill();
+            v
         })
     } else {
         panic!("lambda: args is not list");
     }
 }
 
-fn bind_args(args_name: List, args_val: List, env: &mut Env) {
+fn bind_args(args_name: List, args_val: List, env: & mut  Env) {
     println!("bind_args: {} : {}", args_name, args_val);
     let mut next = true;
     let mut args_name = args_name.clone();
@@ -29,7 +30,7 @@ fn bind_args(args_name: List, args_val: List, env: &mut Env) {
                         next = false;
                         let key = args_name.cdr().car().clone();
                         if let Symbol(name) = key {
-                            env.set(&name, Expr(args_val.clone()));
+                            env.define(&name, Expr(args_val.clone()));
                         } else {
                             panic!("lambda: bind_args: key is not symbol");
                         }
@@ -38,7 +39,7 @@ fn bind_args(args_name: List, args_val: List, env: &mut Env) {
                     }
                 } else {
                     println!("{}:{}", name, v);
-                    env.set(name.as_str(), v.clone());
+                    env.define(name.as_str(), v.clone());
                 }
             }
             _ => {

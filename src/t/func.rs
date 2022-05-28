@@ -3,41 +3,6 @@ use crate::env::Env;
 use std::cell::RefCell;
 use std::rc::Rc;
 
-pub struct Func {
-    pub name: String,
-    pub args: Option<Vec<String>>,
-    pub body: Option<List>,
-    pub func: Option<fn(&mut ApplyArgs) -> LispType>,
-}
-
-impl Func {
-    pub fn new (name: String, args: Option<Vec<String>>, body: Option<List>, func: Option<fn(&mut ApplyArgs) -> LispType>) -> Func {
-        Func {
-            name,
-            args,
-            body,
-            func
-        }
-    }
-
-    pub fn call(&self, args: &mut ApplyArgs) -> LispType {
-        // unimplemented!()
-        if(self.func.is_some()) {
-            print!("self: {}", self.name);
-            (self.func.as_ref().unwrap())(args)
-        } else {
-            panic!("{} is not a procedure", self.name);
-        }
-    }
-}
-
-impl Clone for Func {
-    fn clone(&self) -> Self {
-        self.clone()
-    }
-}
-
-
 pub struct ApplyArgs<'a> {
     expr: List,
     args: Option<List>,
@@ -82,9 +47,9 @@ impl<'a> ApplyArgs<'a> {
         e(exp, self.env)
     }
 
-    pub fn inter_4_env(&mut self, exp: &LispType, env: Rc<RefCell<Env>>) -> LispType {
+    pub fn inter_4_env(&mut self, exp: &LispType, env: &mut Env) -> LispType {
         let e: fn(&LispType, &mut Env) -> LispType = self.inter;
-        e(exp, &mut env.borrow_mut())
+        e(exp, env)
     }
 
     pub fn env(&mut self) -> &mut Env {

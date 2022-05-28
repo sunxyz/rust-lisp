@@ -2,34 +2,33 @@ use std::rc::Rc;
 use crate::t::{
     ApplyArgs,
     LispType::{self, *},
-    List, Func,
+    List,
 };
 
 // use super::t::*;
 use super::env::Env;
-use super::env::EnvOption;
+use super::env::EnvOps;
 use super::parse::parse;
 use super::procedure::init_procedure;
 
 pub fn eval(exp: &'static str) -> Result<LispType, &str> {
-    let root = Env::new();
-    init_procedure(&mut root.borrow_mut());
-    let env = root.borrow_mut().fork();
+    let mut env = Env::new();
+    init_procedure(&mut env);
+    env.fork();
     let exp = parse(exp).unwrap();
-    let r = interpreter(exp, &mut env.borrow_mut());
-    Ok(r)
+    Ok(interpreter(exp, & mut env))
 }
 
-pub fn interpreter(exp: List, env: &mut Env) -> LispType {
+pub fn interpreter(exp: List, env: &mut  Env) -> LispType {
     let car = exp.car();
     println!("car: {}", car);
     let cdr = exp.cdr();
     println!("cdr: {} is-exp:{}", cdr, cdr.is_expr());
     match car {
         Symbol(key) => {
-            let value = env.get(&key, true);
+            let value = env.get(&key);
             let v = env
-                .get(key.as_str(),true)
+                .get(key.as_str())
                 .expect(format!("undefined symbol: {}", key).as_str());
             if let Procedure(f) = v.clone() {
                 if (exp.is_expr()) {
@@ -70,7 +69,7 @@ pub fn interpreter(exp: List, env: &mut Env) -> LispType {
 fn apply(
     f: Rc<Box<dyn Fn(&mut ApplyArgs)->LispType>>,//Func,//fn(&mut ApplyArgs) -> LispType,
     cdr: List,
-    env: &mut Env,
+    env: &mut  Env,
     args: Option<List>,
 ) -> LispType {
     let lazy_args_f: fn(List, &mut Env) -> List = |exp, e| {
@@ -90,10 +89,10 @@ fn apply(
     ))
 }
 
-fn interpreter0(o: &LispType, env: &mut Env) -> LispType {
+fn interpreter0(o: &LispType, env: &mut  Env) -> LispType {
     match o {
         Expr(l) => interpreter(l.clone(), env),
-        Symbol(s) => env.get(s.as_str(),true).expect(format!("undefined symbol {}", s.as_str()).as_str()),
+        Symbol(s) => env.get(s.as_str()).expect(format!("undefined symbol {}", s.as_str()).as_str()),
         _ => o.clone(),
     }
 }
