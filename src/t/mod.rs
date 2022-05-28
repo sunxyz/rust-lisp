@@ -20,6 +20,7 @@ pub enum LispType {
     Expr(List),
     Procedure(Rc<Box<dyn Fn(&mut ApplyArgs) -> LispType>>),
     Cons(Rc<RefCell<Vec<LispType>>>),
+    Vector(Rc<RefCell<Vec<LispType>>>,usize),
 }
 
 impl Clone for LispType {
@@ -34,6 +35,7 @@ impl Clone for LispType {
             LispType::Expr(l) => LispType::Expr(l.clone()),
             LispType::Procedure(f) => LispType::Procedure(f.clone()),
             LispType::Cons(c) => LispType::Cons(c.clone()),
+            LispType::Vector(v,l) => LispType::Vector(v.clone(),l.clone()),
         }
     }
 }
@@ -50,6 +52,7 @@ impl Display for LispType {
             LispType::Expr(l) => write!(f, "{}", l),
             LispType::Procedure(_) => write!(f, "<procedure>"),
             LispType::Cons(c) => write!(f, "({} {})", c.borrow().get(0).unwrap(), c.borrow().get(1).unwrap()),
+            LispType::Vector(v,_) => write!(f, "#({})", v.borrow().iter().map(|x| x.to_string()).collect::<Vec<String>>().join(" ")),
         }
     }
 }

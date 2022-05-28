@@ -4,6 +4,7 @@ mod number;
 mod branch;
 mod cons;
 mod set;
+mod vector;
 
 use crate::env::{Env, EnvOps};
 use crate::t::LispType::*;
@@ -26,8 +27,9 @@ impl ProcedureRegister for Env {
 pub fn init_procedure(env: &mut Env) {
     number::reg_procedure(env);
     define::reg_procedure(env);
+    set::reg_procedure(env);
     lambda::reg_procedure(env);
     branch::reg_procedure(env);
     cons::reg_procedure(env);
-    set::reg_procedure(env);
+    vector::reg_procedure(env);
 }
