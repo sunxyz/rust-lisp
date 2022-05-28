@@ -1,6 +1,8 @@
 mod define;
 mod lambda;
 mod number;
+mod branch;
+mod cons;
 
 use crate::env::{Env, EnvOps};
 use crate::t::LispType::*;
@@ -24,4 +26,6 @@ pub fn init_procedure(env: &mut Env) {
     number::reg_procedure(env);
     define::reg_procedure(env);
     lambda::reg_procedure(env);
+    branch::reg_procedure(env);
+    cons::reg_procedure(env);
 }

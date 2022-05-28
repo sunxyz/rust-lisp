@@ -1,10 +1,11 @@
-mod list;
 mod func;
+mod list;
 
 use std::fmt::Display;
 use std::fmt::Formatter;
 use std::fmt::Result;
 use std::rc::Rc;
+use std::cell::RefCell;
 
 pub use self::func::ApplyArgs;
 pub use self::list::List;
@@ -17,12 +18,11 @@ pub enum LispType {
     Char(char),
     Nil,
     Expr(List),
-    Procedure(Rc<Box<dyn Fn(&mut ApplyArgs)-> LispType>>),
-    // Cons(Cons)
+    Procedure(Rc<Box<dyn Fn(&mut ApplyArgs) -> LispType>>),
+    Cons(Rc<RefCell<Vec<LispType>>>),
 }
 
-
-impl Clone for LispType{
+impl Clone for LispType {
     fn clone(&self) -> Self {
         match self {
             LispType::Number(n) => LispType::Number(*n),
@@ -33,11 +33,10 @@ impl Clone for LispType{
             LispType::Nil => LispType::Nil,
             LispType::Expr(l) => LispType::Expr(l.clone()),
             LispType::Procedure(f) => LispType::Procedure(f.clone()),
-            // LispType::Cons(c) => LispType::Cons(c.clone()),
+            LispType::Cons(c) => LispType::Cons(c.clone()),
         }
     }
 }
-
 
 impl Display for LispType {
     fn fmt(&self, f: &mut Formatter) -> Result {
@@ -50,9 +49,8 @@ impl Display for LispType {
             LispType::Nil => write!(f, "nil"),
             LispType::Expr(l) => write!(f, "{}", l),
             LispType::Procedure(_) => write!(f, "<procedure>"),
-            // LispType::Cons(c) => write!(f, "{}", c),
+            LispType::Cons(c) => write!(f, "({} {})", c.borrow().get(0).unwrap(), c.borrow().get(1).unwrap()),
         }
     }
 }
 // pub use self::atom::*;
-

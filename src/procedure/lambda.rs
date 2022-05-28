@@ -53,6 +53,6 @@ fn bind_args(args_name: List, args_val: List, env: & mut  Env) {
 }
 
 pub fn reg_procedure(env: &mut Env) {
-    let f: fn(&mut ApplyArgs) -> LispType = |x| Procedure(Rc::new(lambda(x)));
+    let f: fn(&mut ApplyArgs) -> LispType = |apply_args| Procedure(Rc::new(lambda(apply_args)));
     env.reg_procedure("lambda", f);
 }
