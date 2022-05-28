@@ -1,5 +1,6 @@
 use super::*;
 use crate::env::Env;
+use crate::t::LispType::*;
 use std::cell::RefCell;
 use std::rc::Rc;
 
@@ -54,5 +55,16 @@ impl<'a> ApplyArgs<'a> {
 
     pub fn env(&mut self) -> &mut Env {
         self.env
+    }
+
+    pub fn apply(&mut self) -> LispType {
+        let args = self.args();
+        if let Procedure(f) = args.car() {
+            let args = args.cdr();
+            self.args = Some(args);
+            f(self)
+        } else {
+            panic!("apply: invalid argument");
+        }
     }
 }

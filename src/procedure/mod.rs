@@ -5,6 +5,9 @@ mod branch;
 mod cons;
 mod set;
 mod vector;
+mod list;
+mod quote;
+mod apply;
 
 use crate::env::{Env, EnvOps};
 use crate::t::LispType::*;
@@ -32,4 +35,7 @@ pub fn init_procedure(env: &mut Env) {
     branch::reg_procedure(env);
     cons::reg_procedure(env);
     vector::reg_procedure(env);
+    list::reg_procedure(env);
+    quote::reg_procedure(env);
+    apply::reg_procedure(env);
 }
