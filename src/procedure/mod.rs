@@ -8,6 +8,7 @@ mod vector;
 mod list;
 mod quote;
 mod apply;
+mod define_macro;
 
 use crate::env::{Env, EnvOps};
 use crate::t::LispType::*;
@@ -38,4 +39,5 @@ pub fn init_procedure(env: &mut Env) {
     list::reg_procedure(env);
     quote::reg_procedure(env);
     apply::reg_procedure(env);
+    define_macro::reg_procedure(env);
 }

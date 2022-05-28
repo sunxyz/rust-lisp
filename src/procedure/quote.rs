@@ -6,4 +6,5 @@ fn quote(apply_args: &mut ApplyArgs) -> LispType {
 
 pub fn reg_procedure(env: &mut Env) {
     env.reg_procedure("quote", quote);
+    env.reg_procedure("'", quote)
 }

@@ -74,7 +74,7 @@ fn parse_atom(s: &str) -> Result<LispType, String> {
         "#t" => LispType::Boolean(true),
         "#f" => LispType::Boolean(false),
         _ => {
-            if s.starts_with("\'") && s.ends_with("\'") {
+            if s.starts_with("\'") && s.ends_with("\'") && s.len() > 2 {
                 LispType::Char(s.chars().nth(1).unwrap())
             } else if s.parse::<i32>().is_ok() {
                 LispType::Number(s.parse::<i32>().unwrap())
