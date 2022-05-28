@@ -1,15 +1,16 @@
 use super::*;
-fn define(apply_args: &mut ApplyArgs) -> LispType {
+
+fn set(apply_args: &mut ApplyArgs) -> LispType {
     let expr = apply_args.expr();
     if let Symbol(key) = expr.car() {
         let v = apply_args.inter(&Expr(expr.cdr()));
-        apply_args.env().define(key.as_str(), v);
+        apply_args.env().set(key.as_str(), v);
         Nil
     } else {
-        panic!("define: invalid argument");
+        panic!("set!: invalid argument");
     }
 }
 
 pub fn reg_procedure(env: &mut Env) {
-    env.reg_procedure("define", define);
+    env.reg_procedure("set!", set);
 }
