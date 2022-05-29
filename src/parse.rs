@@ -16,7 +16,7 @@ fn parse0(exp: &'static str) -> List {
         let is_push = exp.starts_with(PREFIX);
         let next_exp = &exp[1..];
         let to_index = get_to_index(next_exp);
-        next = next_exp.find(SUFFIX)!=None;
+        next = next_exp.find(SUFFIX) != None;
         let sub_exp = &next_exp[..to_index];
         // print!("sub_exp:{} next_exp:{}" , sub_exp, next_exp);
         if (is_push) {
@@ -25,9 +25,9 @@ fn parse0(exp: &'static str) -> List {
             stack.push(expr);
         } else {
             let brother = stack.pop().unwrap();
-            if(stack.is_empty()){
-                stack.push( brother);
-            }else{
+            if (stack.is_empty()) {
+                stack.push(brother);
+            } else {
                 let mut parent = stack.pop().unwrap();
                 parent.push(LispType::Expr(brother));
                 parent.push_all(parse_list(sub_exp));
@@ -44,7 +44,7 @@ fn parse0(exp: &'static str) -> List {
     stack.pop().unwrap()
 }
 
-fn get_to_index(next_exp: &str)-> usize {
+fn get_to_index(next_exp: &str) -> usize {
     let pre = next_exp.find(PREFIX);
     let suf = next_exp.find(SUFFIX);
     if suf != None {
@@ -64,10 +64,29 @@ fn get_to_index(next_exp: &str)-> usize {
     }
 }
 
-fn parse_list(exp: &'static str) -> Vec< LispType> {
-    exp.trim().split_whitespace()
+fn parse_list(exp: &'static str) -> Vec<LispType> {
+    rep_str(exp.to_string())
+        .trim()
+        .split_whitespace()
         .map(|s| parse_atom(s).unwrap())
         .collect()
+}
+
+fn rep_str(str: String) -> String {
+    if let Some(i) = str.find("\'") {
+        let sub = &str[i + 1..];
+        if let Some(j) = sub.find("\'") {
+            let s = &sub[..j].replace(" ", "\\u0009");
+            let mut r = str[..i + 1].to_string();
+            r.push_str(s);
+            let left = str[j + 1..].to_string();
+            r.push_str(rep_str(left).as_str());
+            return r;
+        }
+        return str;
+    } else {
+        return str;
+    }
 }
 
 fn parse_atom(s: &str) -> Result<LispType, String> {
@@ -76,11 +95,13 @@ fn parse_atom(s: &str) -> Result<LispType, String> {
         "#t" => LispType::Boolean(true),
         "#f" => LispType::Boolean(false),
         _ => {
-            if s.starts_with("\'") && s.ends_with("\'") && s.len() > 2 {
-                LispType::Char(s.chars().nth(1).unwrap())
+            if s.starts_with("'") && s.ends_with("'") && s.len() > 2 {
+                LispType::String(s[1..s.len() - 1].replace("\\u0009", " ").to_string())
+            } else if s.starts_with("\\#") && s.len() > 2 {
+                LispType::Char(s.chars().nth(2).unwrap())
             } else if s.parse::<i32>().is_ok() {
                 LispType::Number(s.parse::<i32>().unwrap())
-            }else {
+            } else {
                 LispType::Symbol(s.to_string())
             }
         }
