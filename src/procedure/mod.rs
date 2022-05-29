@@ -1,4 +1,5 @@
 mod define;
+mod let_;
 mod lambda;
 mod number;
 mod branch;
@@ -31,6 +32,7 @@ impl ProcedureRegister for Env {
 pub fn init_procedure(env: &mut Env) {
     number::reg_procedure(env);
     define::reg_procedure(env);
+    let_::reg_procedure(env);
     set::reg_procedure(env);
     lambda::reg_procedure(env);
     branch::reg_procedure(env);
