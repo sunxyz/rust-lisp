@@ -29,6 +29,10 @@ impl<'a> ApplyArgs<'a> {
         }
     }
 
+    pub fn clone_of(&mut self, args: Option<List>) -> ApplyArgs {
+        ApplyArgs::new(List::new(), args, |l, v| List::new(), self.inter, self.env)
+    }
+
     pub fn expr(&self) -> &List {
         &self.expr
     }
@@ -48,10 +52,6 @@ impl<'a> ApplyArgs<'a> {
         e(exp, self.env)
     }
 
-    pub fn get_inter(&mut self,) -> fn(&LispType, &mut Env) -> LispType {
-       self.inter
-    }
-
     pub fn env(&mut self) -> &mut Env {
         self.env
     }
@@ -61,13 +61,13 @@ impl<'a> ApplyArgs<'a> {
         if let Procedure(f) = args.car() {
             let args = args.cdr();
             if let Some(Expr(last)) = args.data().last() {
-                let a = args.data()[0..args.data().len()-1].to_vec();
+                let a = args.data()[0..args.data().len() - 1].to_vec();
                 let mut args = List::new();
                 args.push_all(a);
                 args.push_all(last.data().clone());
                 println!("apply: {}", args);
                 self.args = Some(args);
-            }else {
+            } else {
                 panic!("apply: invalid last argument");
             }
             f(self)

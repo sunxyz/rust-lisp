@@ -10,17 +10,34 @@ fn map(apply_args: &mut ApplyArgs) -> LispType {
     let v = list.cdr().car();
     let mut result = List::new();
     if let Expr(l) = v {
+        if (l.data().len() == 0) {
+            return Expr(result);
+        }
+        let last = if (list.data().len() > 2) {
+            list.cdr()
+                .cdr()
+                .data()
+                .iter()
+                .map(|x| {
+                    if let Expr(l) = x {
+                        l.data().clone()
+                    } else {
+                        Vec::new()
+                    }
+                })
+                .collect::<Vec<Vec<LispType>>>()
+        } else {
+            Vec::new()
+        };
         if let Procedure(proc) = proc {
             for i in 0..l.data().len() {
                 let elem = l.data()[i].clone();
-                let mut apply_args0 = ApplyArgs::new(
-                    List::new(),
-                    Some(List::of(vec![elem, Number(i as i32)])),
-                    |l, v| List::new(),
-                    apply_args.get_inter(),
-                    apply_args.env(),
-                );
-                result.push(proc(&mut apply_args0));
+                let mut args = vec![elem];
+                for o in last.iter() {
+                    args.push(o.get(i).or(Some(&Nil)).unwrap().clone());
+                }
+                args.push(Number(i as i32));
+                result.push(proc(&mut apply_args.clone_of(Some(List::of(args)))));
             }
         } else {
             panic!("map: not a procedure");
@@ -39,14 +56,7 @@ fn for_each(apply_args: &mut ApplyArgs) -> LispType {
         if let Procedure(proc) = proc {
             for i in 0..l.data().len() {
                 let elem = l.data()[i].clone();
-                let mut apply_args0 = ApplyArgs::new(
-                    List::new(),
-                    Some(List::of(vec![elem, Number(i as i32)])),
-                    |l, v| List::new(),
-                    apply_args.get_inter(),
-                    apply_args.env(),
-                );
-                proc(&mut apply_args0);
+                proc(&mut apply_args.clone_of(Some(List::of(vec![elem, Number(i as i32)]))));
             }
         } else {
             panic!("for-each: not a procedure");
