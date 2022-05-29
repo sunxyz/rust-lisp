@@ -13,22 +13,7 @@ fn map(apply_args: &mut ApplyArgs) -> LispType {
         if (l.data().len() == 0) {
             return Expr(result);
         }
-        let last = if (list.data().len() > 2) {
-            list.cdr()
-                .cdr()
-                .data()
-                .iter()
-                .map(|x| {
-                    if let Expr(l) = x {
-                        l.data().clone()
-                    } else {
-                        Vec::new()
-                    }
-                })
-                .collect::<Vec<Vec<LispType>>>()
-        } else {
-            Vec::new()
-        };
+        let last = get_last(list);
         if let Procedure(proc) = proc {
             for i in 0..l.data().len() {
                 let elem = l.data()[i].clone();
@@ -53,18 +38,46 @@ fn for_each(apply_args: &mut ApplyArgs) -> LispType {
     let proc = list.car();
     let v = list.cdr().car();
     if let Expr(l) = v {
+        if (l.data().len() == 0) {
+            return Nil;
+        }
+        let last = get_last(list);
         if let Procedure(proc) = proc {
             for i in 0..l.data().len() {
                 let elem = l.data()[i].clone();
-                proc(&mut apply_args.clone_of(Some(List::of(vec![elem, Number(i as i32)]))));
+                let mut args = vec![elem];
+                for o in last.iter() {
+                    args.push(o.get(i).or(Some(&Nil)).unwrap().clone());
+                }
+                args.push(Number(i as i32));
+                proc(&mut apply_args.clone_of(Some(List::of(args))));
             }
         } else {
-            panic!("for-each: not a procedure");
+            panic!("map: not a procedure");
         }
     } else {
         panic!("for-each: not a list");
     }
     Nil
+}
+
+fn get_last(list: &List) -> Vec<Vec<LispType>> {
+    if (list.data().len() > 2) {
+        list.cdr()
+            .cdr()
+            .data()
+            .iter()
+            .map(|x| {
+                if let Expr(l) = x {
+                    l.data().clone()
+                } else {
+                    Vec::new()
+                }
+            })
+            .collect::<Vec<Vec<LispType>>>()
+    } else {
+        Vec::new()
+    }
 }
 
 pub fn reg_procedure(env: &mut Env) {
