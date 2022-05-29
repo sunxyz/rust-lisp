@@ -62,11 +62,11 @@ impl<'a> ApplyArgs<'a> {
         if let Procedure(f) = args.car() {
             let args = args.cdr();
             if let Some(Expr(last)) = args.data().last() {
-                let a = last.data().to_vec();
+                let a = args.data()[0..args.data().len()-1].to_vec();
                 let mut args = List::new();
                 args.push_all(a);
                 println!("apply: {}", args);
-                args.push(Expr(last.clone()));
+                args.push_all(last.data().clone());
                 self.args = Some(args);
             }else {
                 panic!("apply: invalid last argument");
