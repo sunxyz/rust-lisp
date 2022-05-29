@@ -60,15 +60,19 @@ impl<'a> ApplyArgs<'a> {
         let args = self.args();
         if let Procedure(f) = args.car() {
             let args = args.cdr();
-            if let Some(Expr(last)) = args.data().last() {
-                let a = args.data()[0..args.data().len() - 1].to_vec();
-                let mut args = List::new();
-                args.push_all(a);
-                args.push_all(last.data().clone());
-                println!("apply: {}", args);
-                self.args = Some(args);
+            if (args.is_nil()) {
+                self.args = None;
             } else {
-                panic!("apply: invalid last argument");
+                if let Some(Expr(last)) = args.data().last() {
+                    let a = args.data()[0..args.data().len() - 1].to_vec();
+                    let mut args = List::new();
+                    args.push_all(a);
+                    args.push_all(last.data().clone());
+                    println!("apply: {}", args);
+                    self.args = Some(args);
+                } else {
+                    panic!("apply: invalid last argument");
+                }
             }
             f(self)
         } else {
