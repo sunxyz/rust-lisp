@@ -60,13 +60,17 @@ impl<'a> ApplyArgs<'a> {
     pub fn apply(&mut self) -> LispType {
         let args = self.args();
         if let Procedure(f) = args.car() {
-            let mut args = args.cdr();
-            if let Expr(a) = args.car() {
-                if(args.data().len()==1){
-                    args=a;
-                }
-            } 
-            self.args = Some(args);
+            let args = args.cdr();
+            if let Some(Expr(last)) = args.data().last() {
+                let a = last.data().to_vec();
+                let mut args = List::new();
+                args.push_all(a);
+                println!("apply: {}", args);
+                args.push(Expr(last.clone()));
+                self.args = Some(args);
+            }else {
+                panic!("apply: invalid last argument");
+            }
             f(self)
         } else {
             panic!("apply: invalid argument");
