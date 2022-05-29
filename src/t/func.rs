@@ -65,8 +65,8 @@ impl<'a> ApplyArgs<'a> {
                 let a = args.data()[0..args.data().len()-1].to_vec();
                 let mut args = List::new();
                 args.push_all(a);
-                println!("apply: {}", args);
                 args.push_all(last.data().clone());
+                println!("apply: {}", args);
                 self.args = Some(args);
             }else {
                 panic!("apply: invalid last argument");

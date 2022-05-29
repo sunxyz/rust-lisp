@@ -5,6 +5,7 @@ fn lambda(apply_args: &mut ApplyArgs) -> Box<dyn Fn(&mut ApplyArgs) -> LispType>
         let body = Expr(apply_args.expr().cdr());
         Box::new(move |x| {
             x.env().fork();
+            println!("----------------");
             bind_args(args.clone(), x.args().clone(), x.env());
             let v = x.inter(&body);
             x.env().kill();
@@ -26,14 +27,15 @@ fn bind_args(args_name: List, args_val: List, env: & mut  Env) {
         match k {
             Symbol(name) => {
                 if (name == ".") {
-                    if (args_val.data().len() == 2) {
-                        next = false;
+                    if (args_name.data().len() == 2) {
                         let key = args_name.cdr().car().clone();
                         if let Symbol(name) = key {
-                            env.define(&name, Expr(args_val.clone()));
+                            env.define(name.as_str(), Expr(args_val.clone()));
+                            println!("key:{} v:{}",name,args_val);
                         } else {
                             panic!("lambda: bind_args: key is not symbol");
                         }
+                        return;
                     } else {
                         panic!("lambda: wrong number of arguments");
                     }

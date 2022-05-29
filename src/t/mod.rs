@@ -44,7 +44,7 @@ impl Display for LispType {
     fn fmt(&self, f: &mut Formatter) -> Result {
         match self {
             LispType::Number(i) => write!(f, "{}", i),
-            LispType::Symbol(s) => write!(f, "'{}", s),
+            LispType::Symbol(s) => write!(f, "{}", s),
             LispType::String(s) => write!(f, "{}", s),
             LispType::Boolean(b) => write!(f, "{}", if *b { "#t" } else { "#f" }),
             LispType::Char(c) => write!(f, "{}", c),

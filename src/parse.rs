@@ -14,11 +14,11 @@ fn parse0(exp: &'static str) -> List {
     while next {
         exp = exp.trim();
         let is_push = exp.starts_with(PREFIX);
-        let next_exp = exp[1..].trim();
+        let next_exp = &exp[1..];
         let to_index = get_to_index(next_exp);
         next = next_exp.find(SUFFIX)!=None;
         let sub_exp = &next_exp[..to_index];
-        // println!("sub_exp: {}", sub_exp);
+        // print!("sub_exp:{} next_exp:{}" , sub_exp, next_exp);
         if (is_push) {
             let mut expr = List::new();
             expr.push_all(parse_list(sub_exp));
@@ -37,7 +37,9 @@ fn parse0(exp: &'static str) -> List {
 
         // println!("stack: {}", stack.len());
         // println!("-----");
+        // print!("old-exp:{}to_index:{}",exp, to_index);
         exp = exp[to_index + 1..].trim();
+        // println!("exp:{}",exp)
     }
     stack.pop().unwrap()
 }
@@ -63,7 +65,7 @@ fn get_to_index(next_exp: &str)-> usize {
 }
 
 fn parse_list(exp: &'static str) -> Vec< LispType> {
-    exp.split_whitespace()
+    exp.trim().split_whitespace()
         .map(|s| parse_atom(s).unwrap())
         .collect()
 }

@@ -18,7 +18,8 @@ fn define_macro(apply_args: &mut ApplyArgs) -> LispType {
                     args.push_all(vec![Symbol("'".to_string()), Expr(x.expr().clone())]);
                     expr.push_all(vec![Symbol("apply".to_string()), proc.clone(), Expr(args.clone())]);
                     println!("define-macro: {} => {}", args, expr);
-                    x.inter(&Expr(expr))
+                    let template = x.inter(&Expr(expr));
+                    x.inter(&template)
                 }))),
             );
         } else {
@@ -38,13 +39,11 @@ fn render(apply_args: &mut ApplyArgs) -> LispType {
 
 fn render0(exp: &List, apply_args: &mut ApplyArgs) -> List {
     let mut list = List::new();
-    for elem in apply_args.expr().data().clone() {
+    for elem in exp.data().clone() {
+        println!("elem:{}",elem);
         if let Symbol(k) = elem {
-            if let Some(0) = k.find(",") {
-                let name = k.clone().replace(",", "");
-                let v = apply_args.inter(&Symbol(name));
-                list.push(v);
-            } else if let Some(0) = k.find(",@") {
+            if let Some(0) = k.find(",@") {
+                println!("render: ,@");
                 let name = k.clone().replace(",@", "");
                 let v = apply_args.inter(&Symbol(name));
                 if let Expr(l) = v {
@@ -52,6 +51,10 @@ fn render0(exp: &List, apply_args: &mut ApplyArgs) -> List {
                 } else {
                     list.push(v);
                 }
+            } else if let Some(0) = k.find(",") {
+                let name = k.clone().replace(",", "");
+                let v = apply_args.inter(&Symbol(name));
+                list.push(v);
             } else {
                 list.push(Symbol(k.clone()));
             }

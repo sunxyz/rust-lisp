@@ -16,6 +16,8 @@ fn car(apply_args: &mut ApplyArgs) -> LispType {
     let lisp = apply_args.args().car();
     if let Cons(c) = lisp {
         c.borrow().get(0).unwrap().clone()
+    } else if let Expr(l) = lisp {
+        l.car()
     } else {
         panic!("car: not a cons");
     }
@@ -25,6 +27,8 @@ fn cdr(apply_args: &mut ApplyArgs) -> LispType {
     let lisp = apply_args.args().car();
     if let Cons(c) = lisp {
         c.borrow().get(1).unwrap().clone()
+    } else if let Expr(l) = lisp {
+        Expr(l.cdr())
     } else {
         panic!("car: not a cons");
     }
