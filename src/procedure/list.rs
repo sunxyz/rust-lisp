@@ -21,7 +21,6 @@ fn map(apply_args: &mut ApplyArgs) -> LispType {
                 for o in last.iter() {
                     args.push(o.get(i).or(Some(&Nil)).unwrap().clone());
                 }
-                args.push(Number(i as i32));
                 result.push(proc(&mut apply_args.clone_of(Some(List::of(args)))));
             }
         } else {
@@ -49,7 +48,6 @@ fn for_each(apply_args: &mut ApplyArgs) -> LispType {
                 for o in last.iter() {
                     args.push(o.get(i).or(Some(&Nil)).unwrap().clone());
                 }
-                args.push(Number(i as i32));
                 proc(&mut apply_args.clone_of(Some(List::of(args))));
             }
         } else {
