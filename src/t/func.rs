@@ -48,9 +48,8 @@ impl<'a> ApplyArgs<'a> {
         e(exp, self.env)
     }
 
-    pub fn inter_4_env(&mut self, exp: &LispType, env: &mut Env) -> LispType {
-        let e: fn(&LispType, &mut Env) -> LispType = self.inter;
-        e(exp, env)
+    pub fn get_inter(&mut self,) -> fn(&LispType, &mut Env) -> LispType {
+       self.inter
     }
 
     pub fn env(&mut self) -> &mut Env {

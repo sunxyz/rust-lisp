@@ -16,6 +16,10 @@ impl List {
         List(Vec::new(), ListType::EXPR)
     }
 
+    pub fn of(elems: Vec<LispType>) -> Self {
+        List(elems, ListType::EXPR)
+    }
+
     pub fn car(&self) -> LispType {
         self.0[0].clone()
     }
