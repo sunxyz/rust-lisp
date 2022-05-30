@@ -1,12 +1,20 @@
 use super::*;
 
-fn lambda(apply_args: &mut ApplyArgs) -> Box<dyn Fn(&mut ApplyArgs) -> LispType> {
+fn lambda(apply_args: &mut ApplyArgs, lazy_eval: bool) -> Box<dyn Fn(&mut ApplyArgs) -> LispType> {
     if let Expr(args_name) = apply_args.expr().car() {
         let body = Expr(apply_args.expr().cdr());
         Box::new(move |x| {
             x.env().fork();
             if (!args_name.is_nil()) {
-                bind_args(args_name.clone(), x.args().clone(), x.env());
+                bind_args(
+                    args_name.clone(),
+                    if lazy_eval {
+                        x.expr().clone()
+                    } else {
+                        x.args().clone()
+                    },
+                    x.env(),
+                );
             }
             let v = x.inter(&body);
             x.env().kill();
@@ -56,6 +64,6 @@ fn bind_args(args_name: List, args_val: List, env: &mut Env) {
 }
 
 pub fn reg_procedure(env: &mut Env) {
-    let f: fn(&mut ApplyArgs) -> LispType = |apply_args| Procedure(Rc::new(lambda(apply_args)));
+    let f: fn(&mut ApplyArgs) -> LispType = |apply_args| Procedure(Rc::new(lambda(apply_args, false)));
     env.reg_procedure("lambda", f);
 }

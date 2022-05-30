@@ -20,6 +20,7 @@ mod char;
 mod procedure;
 mod type_;
 mod nil;
+mod lazy_evaluation;
 
 use crate::env::{Env, EnvOps};
 use crate::t::LispType::*;
@@ -62,4 +63,5 @@ pub fn init_procedure(env: &mut Env) {
     procedure::reg_procedure(env);
     type_::reg_procedure(env);
     nil::reg_procedure(env);
+    lazy_evaluation::reg_procedure(env);
 }

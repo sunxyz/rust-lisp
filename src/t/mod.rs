@@ -117,11 +117,8 @@ impl PartialEq for LispType {
     }
 }
 impl LispType {
-    pub fn new_exp() -> LispType {
-        LispType::Expr(List::new())
-    }
-    pub fn exp_of(l: List) -> LispType {
-        LispType::Expr(l)
+    pub fn cons_of(car:LispType, cdr:LispType) -> LispType {
+        LispType::Cons(Rc::new(RefCell::new(vec![car, cdr])))
     }
 }
 // pub use self::atom::*;
