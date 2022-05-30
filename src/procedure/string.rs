@@ -37,6 +37,24 @@ fn mark_string(apply_args: &mut ApplyArgs) -> LispType {
     }
 }
 
+fn string_eq(apply_args: &mut ApplyArgs) -> LispType {
+    let list = apply_args.args();
+    if (list.len() != 2) {
+        panic!("string=?: wrong number of arguments");
+    }
+    let arg1 = list.car();
+    let arg2 = list.cdr().car();
+    if let Strings(s1) = arg1 {
+        if let Strings(s2) = arg2 {
+            Boolean(s1 == s2)
+        } else {
+            panic!("string=?: not a string");
+        }
+    } else {
+        panic!("string=?: not a string");
+    }
+}
+
 fn string_length(apply_args: &mut ApplyArgs) -> LispType {
     let list = apply_args.args();
     if (list.len() != 1) {
@@ -154,7 +172,7 @@ fn string_append(apply_args: &mut ApplyArgs) -> LispType {
             if let Strings(s) = arg {
                 result.push_str(&s);
             } else {
-                panic!("string-append: not a string");
+                result.push_str(&arg.to_string());
             }
         }
         Strings(result)
@@ -253,6 +271,7 @@ fn string2bool(apply_args: &mut ApplyArgs) -> LispType {
 
 pub fn reg_procedure(env: &mut Env) {
     env.reg_procedure("string?", is_string);
+    env.reg_procedure("string=?", string_eq);
     env.reg_procedure("mark-string", mark_string);
     env.reg_procedure("string-length", string_length);
     env.reg_procedure("string-ref", string_ref);

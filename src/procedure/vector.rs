@@ -42,6 +42,16 @@ fn is_vector(apply_args: &mut ApplyArgs) -> LispType {
     }
 }
 
+fn vector_eq(apply_args: &mut ApplyArgs) -> LispType {
+    let list = apply_args.args();
+    if (list.len() != 2) {
+        panic!("vector=?: wrong number of arguments");
+    }
+    let arg1 = list.car();
+    let arg2 = list.cdr().car();
+    Boolean(arg1 == arg2)
+}
+
 fn vector_length(apply_args: &mut ApplyArgs) -> LispType {
     let list = apply_args.args();
     let size = list.len();
@@ -132,6 +142,7 @@ fn vector2list(apply_args: &mut ApplyArgs) -> LispType {
 
 pub fn reg_procedure(env: &mut Env) {
     env.reg_procedure("vector?", is_vector);
+    env.reg_procedure("vector=?", vector_eq);
     env.reg_procedure("make-vector", make_vector);
     env.reg_procedure("vector", vector);
     env.reg_procedure("vector-length", vector_length);

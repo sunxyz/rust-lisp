@@ -19,6 +19,16 @@ fn list(apply_args: &mut ApplyArgs) -> LispType {
     Expr(apply_args.args().clone())
 }
 
+fn list_eq(apply_args: &mut ApplyArgs) -> LispType {
+    let list = apply_args.args();
+    if (list.len() != 2) {
+        panic!("list=?: wrong number of arguments");
+    }
+    let arg1 = list.car();
+    let arg2 = list.cdr().car();
+    Boolean(arg1 == arg2)
+}
+
 fn list_length(apply_args: &mut ApplyArgs) -> LispType {
     let list = apply_args.args();
     if (list.len() != 1) {
@@ -55,7 +65,6 @@ fn list_ref(apply_args: &mut ApplyArgs) -> LispType {
         panic!("list-ref: not a list");
     }
 }
-
 
 fn list_tail(apply_args: &mut ApplyArgs) -> LispType {
     let list = apply_args.args();
@@ -111,8 +120,8 @@ fn append(apply_args: &mut ApplyArgs) -> LispType {
     if (list.len() < 1) {
         panic!("append: wrong number of arguments");
     }
-    let  result = list.car().clone();
-    let  args = list.cdr();
+    let result = list.car().clone();
+    let args = list.cdr();
     if let Expr(r) = result {
         let mut r = r.clone();
         args.for_each(|arg| {
@@ -162,7 +171,13 @@ fn list2string(apply_args: &mut ApplyArgs) -> LispType {
     }
     let arg = list.car();
     if let Expr(l) = arg {
-        Strings(l.data().iter().map(|x| x.to_string()).collect::<Vec<String>>().join(""))
+        Strings(
+            l.data()
+                .iter()
+                .map(|x| x.to_string())
+                .collect::<Vec<String>>()
+                .join(""),
+        )
     } else {
         panic!("list->string: not a list");
     }
@@ -309,6 +324,7 @@ fn get_last(list: &List) -> Vec<Vec<LispType>> {
 
 pub fn reg_procedure(env: &mut Env) {
     env.reg_procedure("list?", is_list);
+    env.reg_procedure("list=?", list_eq);
     env.reg_procedure("list", list);
     env.reg_procedure("list-ref", list_ref);
     env.reg_procedure("list-tail", list_tail);

@@ -104,6 +104,20 @@ impl Clone for List {
     }
 }
 
+impl PartialEq for List {
+    fn eq(&self, other: &Self) -> bool {
+        if self.0.borrow().len() != other.0.borrow().len() {
+            return false;
+        }
+        for i in 0..self.0.borrow().len() {
+            if self.0.borrow()[i] != other.0.borrow()[i] {
+                return false;
+            }
+        }
+        true
+    }
+}
+
 impl Iterator for List {
     type Item = LispType;
 
