@@ -73,15 +73,18 @@ fn parse_list(exp: &str) -> Vec<LispType> {
 }
 
 fn rep_str(str: String) -> String {
-    if let Some(i) = str.find("\'") {
+    if let Some(i) = str.find("'") {
         let sub = &str[i + 1..];
-        if let Some(j) = sub.find("\'") {
+        if let Some(j) = sub.find("'") {
             let s = &sub[..j].replace(" ", "\\u0009");
-            let mut r = str[..i + 1].to_string();
-            r.push_str(s);
-            let left = str[j + 1..].to_string();
-            r.push_str(rep_str(left).as_str());
-            return r;
+            let mut all_str = String::new();
+            let right_str = &str[..i+1];
+            let left_str = &sub[j..];
+            all_str.push_str(right_str);
+            all_str.push_str(s);
+            // println!("right_str:[{}] s:[{}] left_str:[{}]", right_str, s, left_str);
+            all_str.push_str(rep_str(left_str.to_string()).as_str());
+            return all_str;
         }
         return str;
     } else {

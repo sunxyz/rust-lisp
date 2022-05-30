@@ -48,4 +48,6 @@ pub fn init_procedure(env: &mut Env) {
     define_macro::reg_procedure(env);
     io::reg_procedure(env);
     load::reg_procedure(env);
+    eval::reg_procedure(env);
+    boolean::reg_procedure(env);
 }
