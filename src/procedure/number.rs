@@ -73,6 +73,27 @@ fn divide(apply_args: &mut ApplyArgs) -> LispType {
     calc(apply_args, |a, b| a / b)
 }
 
+fn less_than(apply_args: &mut ApplyArgs) -> LispType {
+    calc(apply_args, |a, b| if a < b { 1 } else { 0 })
+}
+
+fn less_than_or_equal(apply_args: &mut ApplyArgs) -> LispType {
+    calc(apply_args, |a, b| if a <= b { 1 } else { 0 })
+}
+
+fn greater_than(apply_args: &mut ApplyArgs) -> LispType {
+    calc(apply_args, |a, b| if a > b { 1 } else { 0 })
+}
+
+fn greater_than_or_equal(apply_args: &mut ApplyArgs) -> LispType {
+    calc(apply_args, |a, b| if a >= b { 1 } else { 0 })
+}
+
+
+fn eq(apply_args: &mut ApplyArgs) -> LispType {
+    calc(apply_args, |a, b| if a == b { 1 } else { 0 })
+}
+
 fn calc(apply_args: &mut ApplyArgs, f: fn(i32, i32) -> i32) -> LispType {
     Number(
         apply_args
@@ -98,4 +119,9 @@ pub fn reg_procedure(env: &mut Env) {
     env.reg_procedure("-", subtract);
     env.reg_procedure("*", multiply);
     env.reg_procedure("/", divide);
+    env.reg_procedure("<", less_than);
+    env.reg_procedure("<=", less_than_or_equal);
+    env.reg_procedure(">", greater_than);
+    env.reg_procedure(">=", greater_than_or_equal);
+    env.reg_procedure("=", eq);
 }

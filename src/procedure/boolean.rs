@@ -25,7 +25,17 @@ fn or(apply_args: &mut ApplyArgs) -> LispType {
     Boolean(false)
 }
 
+fn not(apply_args: &mut ApplyArgs) -> LispType {
+    let v = apply_args.inter(&apply_args.expr().car());
+    if is_true(&v) {
+        Boolean(false)
+    } else {
+        Boolean(true)
+    }
+}
+
 pub fn reg_procedure(env: &mut Env) {
     env.reg_procedure("and", and);
     env.reg_procedure("or", or);
+    env.reg_procedure("not", not);
 }
