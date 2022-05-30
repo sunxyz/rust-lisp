@@ -56,4 +56,13 @@ impl Display for LispType {
         }
     }
 }
+
+impl LispType {
+    pub fn new_exp() -> LispType {
+        LispType::Expr(List::new())
+    }
+    pub fn exp_of(l: List) -> LispType {
+        LispType::Expr(l)
+    }
+}
 // pub use self::atom::*;
