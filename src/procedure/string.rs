@@ -1,4 +1,6 @@
 use super::*;
+use crate::utils::bool_utils::is_true;
+use std::cell::RefCell;
 
 fn is_string(apply_args: &mut ApplyArgs) -> LispType {
     let list = apply_args.args();
@@ -161,6 +163,19 @@ fn string_append(apply_args: &mut ApplyArgs) -> LispType {
     }
 }
 
+fn string_copy(apply_args: &mut ApplyArgs) -> LispType {
+    let list = apply_args.args();
+    if (list.len() != 1) {
+        panic!("string-copy: wrong number of arguments");
+    }
+    let arg = list.car();
+    if let Strings(s) = arg {
+        Strings(s.clone())
+    } else {
+        panic!("string-copy: not a string");
+    }
+}
+
 fn string2list(apply_args: &mut ApplyArgs) -> LispType {
     let list = apply_args.args();
     if (list.len() != 1) {
@@ -178,16 +193,61 @@ fn string2list(apply_args: &mut ApplyArgs) -> LispType {
     }
 }
 
-fn string_copy(apply_args: &mut ApplyArgs) -> LispType {
+fn string2symbol(apply_args: &mut ApplyArgs) -> LispType {
     let list = apply_args.args();
     if (list.len() != 1) {
-        panic!("string-copy: wrong number of arguments");
+        panic!("string->symbol: wrong number of arguments");
     }
     let arg = list.car();
     if let Strings(s) = arg {
-        Strings(s.clone())
+        Symbol(s.clone())
     } else {
-        panic!("string-copy: not a string");
+        panic!("string->symbol: not a string");
+    }
+}
+
+fn string2vector(apply_args: &mut ApplyArgs) -> LispType {
+    let list = apply_args.args();
+    if (list.len() != 1) {
+        panic!("string->vector: wrong number of arguments");
+    }
+    let arg = list.car();
+    if let Strings(s) = arg {
+        let mut result = Vec::new();
+        for c in s.chars() {
+            result.push(Char(c));
+        }
+        let size = result.len();
+        Vector(Rc::new(RefCell::new(result)), size)
+    } else {
+        panic!("string->vector: not a string");
+    }
+}
+
+fn string2number(apply_args: &mut ApplyArgs) -> LispType {
+    let list = apply_args.args();
+    if (list.len() != 1) {
+        panic!("string->number: wrong number of arguments");
+    }
+    let arg = list.car();
+    if let Strings(s) = arg {
+        let n = s.parse::<i32>().unwrap();
+        Number(n)
+    } else {
+        panic!("string->number: not a string");
+    }
+}
+
+fn string2bool(apply_args: &mut ApplyArgs) -> LispType {
+    let list = apply_args.args();
+    if (list.len() != 1) {
+        panic!("string->bool: wrong number of arguments");
+    }
+    let arg = list.car();
+    if let Strings(_) = arg.clone() {
+        Boolean(is_true(&arg))
+    } else {
+        panic!("string->boolean: not a string");
     }
 }
 
@@ -199,6 +259,10 @@ pub fn reg_procedure(env: &mut Env) {
     env.reg_procedure("string-set!", string_set);
     env.reg_procedure("substring", substring);
     env.reg_procedure("string-append", string_append);
-    env.reg_procedure("string->list", string2list);
     env.reg_procedure("string-copy", string_copy);
+    env.reg_procedure("string->list", string2list);
+    env.reg_procedure("string->symbol", string2symbol);
+    env.reg_procedure("string->vector", string2vector);
+    env.reg_procedure("string->number", string2number);
+    env.reg_procedure("string->bool", string2bool);
 }

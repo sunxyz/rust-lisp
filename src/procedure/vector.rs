@@ -114,6 +114,22 @@ fn vector_fill(apply_args: &mut ApplyArgs) -> LispType {
     }
 }
 
+fn vector2list(apply_args: &mut ApplyArgs) -> LispType {
+    let list = apply_args.args();
+    if (list.len() != 1) {
+        panic!("vector->list: wrong number of arguments");
+    }
+    if let Vector(l, s) = list.car() {
+        let mut vec = Vec::new();
+        for i in 0..s {
+            vec.push(l.borrow()[i].clone());
+        }
+        Expr(List::of(vec))
+    } else {
+        panic!("vector->list: not a vector");
+    }
+}
+
 pub fn reg_procedure(env: &mut Env) {
     env.reg_procedure("vector?", is_vector);
     env.reg_procedure("make-vector", make_vector);
@@ -122,4 +138,5 @@ pub fn reg_procedure(env: &mut Env) {
     env.reg_procedure("vector-ref", vector_ref);
     env.reg_procedure("vector-set!", vector_set);
     env.reg_procedure("vector-fill!", vector_fill);
+    env.reg_procedure("vector->list", vector2list);
 }

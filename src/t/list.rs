@@ -70,6 +70,7 @@ impl List {
     pub fn data(&self) -> Vec<LispType> {
         self.0.borrow().clone()
     }
+
 }
 
 impl Copy for ListType {}
