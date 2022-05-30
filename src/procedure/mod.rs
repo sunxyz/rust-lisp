@@ -11,6 +11,8 @@ mod quote;
 mod apply;
 mod define_macro;
 mod io;
+mod load;
+mod eval;
 
 use crate::env::{Env, EnvOps};
 use crate::t::LispType::*;
@@ -44,4 +46,5 @@ pub fn init_procedure(env: &mut Env) {
     apply::reg_procedure(env);
     define_macro::reg_procedure(env);
     io::reg_procedure(env);
+    load::reg_procedure(env);
 }

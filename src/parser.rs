@@ -3,14 +3,14 @@ use super::t::*;
 static PREFIX: &'static str = "(";
 static SUFFIX: &'static str = ")";
 
-pub fn parse(exp: &'static str) -> Result<List, String> {
-    Ok(parse0(&exp))
+pub fn parser(exp: String) -> Result<List, String> {
+    Ok(parse0(exp))
 }
 
-fn parse0(exp: &'static str) -> List {
+fn parse0(exp: String) -> List {
     let mut stack = Vec::new();
     let mut next = true;
-    let mut exp = exp.clone();
+    let mut exp = exp.as_str();
     while next {
         exp = exp.trim();
         let is_push = exp.starts_with(PREFIX);
@@ -64,7 +64,7 @@ fn get_to_index(next_exp: &str) -> usize {
     }
 }
 
-fn parse_list(exp: &'static str) -> Vec<LispType> {
+fn parse_list(exp: &str) -> Vec<LispType> {
     rep_str(exp.to_string())
         .trim()
         .split_whitespace()

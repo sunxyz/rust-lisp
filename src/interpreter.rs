@@ -1,25 +1,25 @@
-use std::rc::Rc;
 use crate::t::{
     ApplyArgs,
     LispType::{self, *},
     List,
 };
+use std::rc::Rc;
 
 // use super::t::*;
 use super::env::Env;
 use super::env::EnvOps;
-use super::parse::parse;
+use super::parser::parser;
 use super::procedure::init_procedure;
 
-pub fn eval(exp: &'static str) -> Result<LispType, &str> {
+pub fn eval(exp: &str) -> Result<LispType, &str> {
     let mut env = Env::new();
     init_procedure(&mut env);
     env.fork();
-    let exp = parse(exp).unwrap();
-    Ok(interpreter(exp, & mut env))
+    let exp = parser(exp.to_string()).unwrap();
+    Ok(interpreter(exp, &mut env))
 }
 
-pub fn interpreter(exp: List, env: &mut  Env) -> LispType {
+pub fn interpreter(exp: List, env: &mut Env) -> LispType {
     let car = exp.car();
     println!("car: {}", car);
     let cdr = exp.cdr();
@@ -67,9 +67,9 @@ pub fn interpreter(exp: List, env: &mut  Env) -> LispType {
 }
 
 fn apply(
-    f: Rc<Box<dyn Fn(&mut ApplyArgs)->LispType>>,//Func,//fn(&mut ApplyArgs) -> LispType,
+    f: Rc<Box<dyn Fn(&mut ApplyArgs) -> LispType>>, //Func,//fn(&mut ApplyArgs) -> LispType,
     cdr: List,
-    env: &mut  Env,
+    env: &mut Env,
     args: Option<List>,
 ) -> LispType {
     let lazy_args_f: fn(List, &mut Env) -> List = |exp, e| {
@@ -89,10 +89,12 @@ fn apply(
     ))
 }
 
-fn interpreter0(o: &LispType, env: &mut  Env) -> LispType {
+fn interpreter0(o: &LispType, env: &mut Env) -> LispType {
     match o {
         Expr(l) => interpreter(l.clone(), env),
-        Symbol(s) => env.get(s.as_str()).expect(format!("undefined symbol {}", s.as_str()).as_str()),
+        Symbol(s) => env
+            .get(s.as_str())
+            .expect(format!("undefined symbol {}", s.as_str()).as_str()),
         _ => o.clone(),
     }
 }
