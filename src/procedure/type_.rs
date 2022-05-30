@@ -16,7 +16,7 @@ fn is_type(apply_args: &mut ApplyArgs) -> LispType {
     }
     let arg1 = list.car();
     let arg2 = list.cdr().car();
-    if let Strings(s) = arg2 {
+    if let Symbol(s) = arg2 {
         if get_type_name0(&arg1) == s {
             Boolean(true)
         } else {
