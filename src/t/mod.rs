@@ -13,7 +13,7 @@ pub use self::list::List;
 pub enum LispType {
     Number(i32),
     Symbol(String),
-    String(String),
+    Strings(String),
     Boolean(bool),
     Char(char),
     Nil,
@@ -28,7 +28,7 @@ impl Clone for LispType {
         match self {
             LispType::Number(n) => LispType::Number(*n),
             LispType::Symbol(s) => LispType::Symbol(s.clone()),
-            LispType::String(s) => LispType::String(s.clone()),
+            LispType::Strings(s) => LispType::Strings(s.clone()),
             LispType::Boolean(b) => LispType::Boolean(*b),
             LispType::Char(c) => LispType::Char(*c),
             LispType::Nil => LispType::Nil,
@@ -45,7 +45,7 @@ impl Display for LispType {
         match self {
             LispType::Number(i) => write!(f, "{}", i),
             LispType::Symbol(s) => write!(f, "{}", s),
-            LispType::String(s) => write!(f, "{}", s),
+            LispType::Strings(s) => write!(f, "{}", s),
             LispType::Boolean(b) => write!(f, "{}", if *b { "#t" } else { "#f" }),
             LispType::Char(c) => write!(f, "{}", c),
             LispType::Nil => write!(f, "nil"),

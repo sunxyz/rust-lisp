@@ -11,7 +11,7 @@ pub fn is_true(v: &LispType) -> bool {
                 return true;
             }
         }
-        String(s) => {
+        Strings(s) => {
             if s != "" || s != "nil" || s != "0" || s == "#t" {
                 return true;
             }

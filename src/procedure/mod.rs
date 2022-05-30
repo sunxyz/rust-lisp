@@ -14,6 +14,7 @@ mod io;
 mod load;
 mod eval;
 mod boolean;
+mod string;
 
 use crate::env::{Env, EnvOps};
 use crate::t::LispType::*;
@@ -50,4 +51,5 @@ pub fn init_procedure(env: &mut Env) {
     load::reg_procedure(env);
     eval::reg_procedure(env);
     boolean::reg_procedure(env);
+    string::reg_procedure(env);
 }
