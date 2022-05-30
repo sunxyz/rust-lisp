@@ -1,4 +1,5 @@
 use super::*;
+use crate::utils::bool_utils::is_true;
 
 fn if0(apply_args: &mut ApplyArgs) -> LispType {
     let list = apply_args.expr();
@@ -10,24 +11,19 @@ fn if0(apply_args: &mut ApplyArgs) -> LispType {
         } else {
             Nil
         };
-        if let Boolean(b) = apply_args.inter(&cond) {
-            if b {
-                apply_args.inter(&then)
-            } else {
-                if let Expr(else__) = else_ {
-                    apply_args.inter(&Expr(else__.clone()))
-                } else {
-                    Nil
-                }
-            }
+        if is_true(&apply_args.inter(&cond)) {
+            apply_args.inter(&then)
         } else {
-            panic!("if: cond is not boolean");
+            if let Expr(else__) = else_ {
+                apply_args.inter(&Expr(else__.clone()))
+            } else {
+                Nil
+            }
         }
     } else {
         panic!("if: wrong number of arguments");
     }
 }
-
 
 pub fn reg_procedure(env: &mut Env) {
     env.reg_procedure("if", if0);

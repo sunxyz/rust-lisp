@@ -1,84 +1,28 @@
 use super::*;
+use crate::utils::bool_utils::is_true;
 
 fn and(apply_args: &mut ApplyArgs) -> LispType {
     // apply_args.apply()
     let mut result = Boolean(false);
     for exp in apply_args.expr().data().clone() {
         let v = apply_args.inter(&exp);
-        match v {
-            Boolean(b) => {
-                result = v;
-                if !b {
-                    return Boolean(false);
-                }
-            }
-            Number(n) => {
-                if n != 0 {
-                    result = v;
-                } else {
-                    return Boolean(false);
-                }
-            }
-            String(s) => {
-                if s != "" {
-                    result = String(s.clone());
-                } else {
-                    return Boolean(false);
-                }
-            }
-            Char(c) => {
-                if c != '\0' {
-                    result = v;
-                } else {
-                    return Boolean(false);
-                }
-            }
-            Nil => {
-                return Boolean(false);
-            }
-            _ => {
-                result = v;
-            }
+        if is_true(&v) {
+            result = v;
+        } else {
+            return Boolean(false);
         }
     }
     result
 }
 
 fn or(apply_args: &mut ApplyArgs) -> LispType {
-    // apply_args.apply()
-    let mut result = Boolean(false);
     for exp in apply_args.expr().data().clone() {
         let v = apply_args.inter(&exp);
-        match v {
-            Boolean(b) => {
-                if b {
-                    return v;
-                }
-            }
-            Number(n) => {
-                if n != 0 {
-                    return v;
-                }
-            }
-            String(s) => {
-                if s != "" {
-                    return String(s.clone());
-                }
-            }
-            Char(c) => {
-                if c != '\0' {
-                    return v;
-                }
-            }
-            Nil => {
-                result = Boolean(false);
-            }
-            _ => {
-                return v;
-            }
+        if is_true(&v) {
+            return v;
         }
     }
-    result
+    Boolean(false)
 }
 
 pub fn reg_procedure(env: &mut Env) {
