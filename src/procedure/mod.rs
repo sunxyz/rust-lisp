@@ -19,6 +19,7 @@ mod symbol;
 mod char;
 mod procedure;
 mod type_;
+mod nil;
 
 use crate::env::{Env, EnvOps};
 use crate::t::LispType::*;
@@ -60,4 +61,5 @@ pub fn init_procedure(env: &mut Env) {
     char::reg_procedure(env);
     procedure::reg_procedure(env);
     type_::reg_procedure(env);
+    nil::reg_procedure(env);
 }
