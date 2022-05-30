@@ -21,7 +21,7 @@ impl EnvOps for Env {
     }
 
     fn get(&self, key: &str) -> Option<LispType> {
-        println!("get key: {}, env deep: {}", key, self.0.len());
+        // println!("get key: {}, env deep: {}", key, self.0.len());
         for map in self.0.iter().rev() {
             if let Some(value) = map.get(key) {
                 return Some(value.clone());

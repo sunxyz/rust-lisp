@@ -41,7 +41,7 @@ impl<'a> ApplyArgs<'a> {
         if let None = self.args {
             let lazy_f = self.lazy_args;
             let v = lazy_f(self.expr().clone(), self.env);
-            println!("args is None exp: {} => {}", self.expr(), v);
+            // println!("args is None exp: {} => {}", self.expr(), v);
             self.args = Some(v);
         }
         self.args.as_ref().unwrap()

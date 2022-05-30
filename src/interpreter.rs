@@ -21,9 +21,9 @@ pub fn eval(exp: &str) -> Result<LispType, &str> {
 
 pub fn interpreter(exp: List, env: &mut Env) -> LispType {
     let car = exp.car();
-    println!("car: {}", car);
+    // println!("car: {}", car);
     let cdr = exp.cdr();
-    println!("cdr: {} is-exp:{}", cdr, cdr.is_expr());
+    // println!("cdr: {} is-exp:{}", cdr, cdr.is_expr());
     match car {
         Symbol(key) => {
             let value = env.get(&key);
@@ -32,7 +32,7 @@ pub fn interpreter(exp: List, env: &mut Env) -> LispType {
                 .expect(format!("undefined symbol: {}", key).as_str());
             if let Procedure(f) = v.clone() {
                 if (exp.is_expr()) {
-                    println!("exc: {}", cdr);
+                    // println!("exc: {}", cdr);
                     return apply(f, cdr, env, None);
                 }
             }
@@ -46,7 +46,7 @@ pub fn interpreter(exp: List, env: &mut Env) -> LispType {
             let v = interpreter(l, env);
             if let Procedure(f) = v.clone() {
                 if (exp.is_expr()) {
-                    println!("exc0: {}", cdr);
+                    // println!("exc0: {}", cdr);
                     return apply(f, cdr, env, None);
                 }
             }
