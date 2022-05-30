@@ -1,4 +1,5 @@
 use super::*;
+use crate::utils::bool_utils::is_true;
 
 fn list(apply_args: &mut ApplyArgs) -> LispType {
     Expr(apply_args.args().clone())
@@ -6,6 +7,9 @@ fn list(apply_args: &mut ApplyArgs) -> LispType {
 
 fn map(apply_args: &mut ApplyArgs) -> LispType {
     let list = apply_args.args();
+    if (list.data().len() < 2) {
+        panic!("map: wrong number of arguments");
+    }
     let proc = list.car();
     let v = list.cdr().car();
     let mut result = List::new();
@@ -32,8 +36,70 @@ fn map(apply_args: &mut ApplyArgs) -> LispType {
     Expr(result)
 }
 
+fn filter(apply_args: &mut ApplyArgs) -> LispType {
+    let list = apply_args.args();
+    if (list.data().len() != 2) {
+        panic!("filter: wrong number of arguments");
+    }
+    let proc = list.car();
+    let args = list.cdr().car();
+    let mut result = List::new();
+    if let Procedure(proc) = proc {
+        if let Expr(l) = args {
+            if (l.data().len() == 0) {
+                return Expr(result);
+            } else {
+                for elem in l.data().iter() {
+                    if is_true(&proc(
+                        &mut apply_args.clone_of(Some(List::of(vec![elem.clone()]))),
+                    )) {
+                        result.push(elem.clone());
+                    }
+                }
+            }
+        } else {
+            panic!("filter: not a list");
+        }
+    } else {
+        panic!("filter: not a procedure");
+    }
+    Expr(result)
+}
+
+fn reduce(apply_args: &mut ApplyArgs) -> LispType {
+    let list = apply_args.args();
+    if (list.data().len() != 3) {
+        panic!("reduce: wrong number of arguments");
+    }
+    let proc = list.car();
+    let mut result = list.cdr().car();
+    let args = list.cdr().cdr().car();
+    if let Procedure(proc) = proc {
+        if let Expr(l) = args {
+            if (l.data().len() == 0) {
+                return result.clone();
+            } else {
+                for elem in l.data().iter() {
+                    result = proc(
+                        &mut apply_args
+                            .clone_of(Some(List::of(vec![result.clone(), elem.clone()]))),
+                    );
+                }
+            }
+        } else {
+            panic!("reduce: not a list");
+        }
+    } else {
+        panic!("reduce: not a procedure");
+    }
+    result
+}
+
 fn for_each(apply_args: &mut ApplyArgs) -> LispType {
     let list = apply_args.args();
+    if (list.data().len() < 2) {
+        panic!("for-each: wrong number of arguments");
+    }
     let proc = list.car();
     let v = list.cdr().car();
     if let Expr(l) = v {
