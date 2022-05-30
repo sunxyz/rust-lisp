@@ -21,7 +21,7 @@ fn parse0(exp: String) -> List {
         // print!("sub_exp:{} next_exp:{}" , sub_exp, next_exp);
         if (is_push) {
             let mut expr = List::new();
-            expr.push_all(parse_list(sub_exp));
+            expr.push_vec(parse_list(sub_exp));
             stack.push(expr);
         } else {
             let brother = stack.pop().unwrap();
@@ -30,7 +30,7 @@ fn parse0(exp: String) -> List {
             } else {
                 let mut parent = stack.pop().unwrap();
                 parent.push(LispType::Expr(brother));
-                parent.push_all(parse_list(sub_exp));
+                parent.push_vec(parse_list(sub_exp));
                 stack.push(parent);
             }
         }

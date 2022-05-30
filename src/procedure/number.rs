@@ -20,11 +20,10 @@ fn calc(apply_args: &mut ApplyArgs, f: fn(i32, i32) -> i32) -> LispType {
     Number(
         apply_args
             .args()
-            .data()
-            .iter()
+            .clone()
             .map(|x| -> i32 {
                 match x {
-                    LispType::Number(i) => *i,
+                    LispType::Number(i) => i,
                     v => panic!("{} not a number", v),
                 }
             })

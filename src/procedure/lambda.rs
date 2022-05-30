@@ -28,7 +28,7 @@ fn bind_args(args_name: List, args_val: List, env: &mut Env) {
         match k {
             Symbol(name) => {
                 if (name == ".") {
-                    if (args_name.data().len() == 2) {
+                    if (args_name.len() == 2) {
                         let key = args_name.cdr().car().clone();
                         if let Symbol(name) = key {
                             env.define(name.as_str(), Expr(args_val.clone()));

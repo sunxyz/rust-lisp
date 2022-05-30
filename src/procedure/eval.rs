@@ -3,7 +3,7 @@ use crate::parser::parser;
 
 fn eval(apply_args: &mut ApplyArgs) -> LispType {
     let mut result = Nil;
-    apply_args.args().data().clone().iter().for_each(|arg| {
+    apply_args.args().clone().for_each(|arg| {
         if let Strings(contents) = arg {
             result = apply_args.inter(&Expr(parser(contents.to_string()).unwrap()));
         } else {

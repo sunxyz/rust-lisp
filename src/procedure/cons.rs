@@ -3,7 +3,7 @@ use std::cell::RefCell;
 
 fn cons(apply_args: &mut ApplyArgs) -> LispType {
     let list = apply_args.args();
-    if list.data().len() > 1 {
+    if list.len() > 1 {
         let car = list.car();
         let cdr = list.cdr().car();
         Cons(Rc::new(RefCell::new(vec![car, cdr])))

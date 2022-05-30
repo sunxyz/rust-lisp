@@ -3,10 +3,10 @@ use crate::utils::bool_utils::is_true;
 
 fn if0(apply_args: &mut ApplyArgs) -> LispType {
     let list = apply_args.expr();
-    if list.data().len() > 1 {
+    if list.len() > 1 {
         let cond = list.car();
         let then = list.cdr().car();
-        let else_ = if list.data().len() > 2 {
+        let else_ = if list.len() > 2 {
             Expr(list.cdr().cdr())
         } else {
             Nil

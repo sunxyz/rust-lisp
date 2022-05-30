@@ -55,12 +55,20 @@ impl List {
         self.0.borrow_mut().push(elem);
     }
 
-    pub fn push_all(&mut self, elem: Vec<LispType>) {
+    pub fn push_vec(&mut self, elem: Vec<LispType>) {
         self.0.borrow_mut().extend(elem);
     }
 
-    pub fn data(&self) -> &Vec<LispType> {
-        &self.0.borrow()
+    pub fn push_all(&mut self, elem: List) {
+        self.0.borrow_mut().extend(elem);
+    }
+
+    pub fn len(&self) -> usize {
+        self.0.borrow().len()
+    }
+
+    pub fn data(&self) -> Vec<LispType> {
+        self.0.borrow().clone()
     }
 }
 
@@ -92,5 +100,25 @@ impl Display for List {
 impl Clone for List {
     fn clone(&self) -> Self {
         List(self.0.clone(), self.1)
+    }
+}
+
+impl Iterator for List {
+    type Item = LispType;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.is_nil() {
+            None
+        } else {
+            let t = self.0.borrow_mut().remove(0);
+            Some(t)
+        }
+    }
+}
+
+
+fn t (l : List){
+    for i in l{
+        println!("{}",i);
     }
 }

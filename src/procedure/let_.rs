@@ -7,9 +7,9 @@ fn let_(apply_args: &mut ApplyArgs) -> LispType {
     let body = list.cdr();
     let mut lex_env = HashMap::new();
     if let Expr(l) = let_x {
-        for elem in l.data() {
+        for elem in l {
             if let Expr(kv) = elem {
-                if (kv.data().len() != 2) {
+                if (kv.len() != 2) {
                     panic!("let_: invalid argument");
                 } else {
                     let key = kv.car();
@@ -43,9 +43,9 @@ fn let_x(apply_args: &mut ApplyArgs) -> LispType {
     let body = list.cdr();
     apply_args.env().fork();
     if let Expr(l) = let_x {
-        for elem in l.data() {
+        for elem in l {
             if let Expr(kv) = elem {
-                if (kv.data().len() != 2) {
+                if (kv.len() != 2) {
                     panic!("let*: invalid argument");
                 } else {
                     let key = kv.car();

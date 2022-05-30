@@ -4,7 +4,7 @@ use crate::utils::bool_utils::is_true;
 fn and(apply_args: &mut ApplyArgs) -> LispType {
     // apply_args.apply()
     let mut result = Boolean(false);
-    for exp in apply_args.expr().data().clone() {
+    for exp in apply_args.expr().clone() {
         let v = apply_args.inter(&exp);
         if is_true(&v) {
             result = v;
@@ -16,7 +16,7 @@ fn and(apply_args: &mut ApplyArgs) -> LispType {
 }
 
 fn or(apply_args: &mut ApplyArgs) -> LispType {
-    for exp in apply_args.expr().data().clone() {
+    for exp in apply_args.expr().clone() {
         let v = apply_args.inter(&exp);
         if is_true(&v) {
             return v;

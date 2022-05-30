@@ -5,7 +5,7 @@ fn make_vector(apply_args: &mut ApplyArgs) -> LispType {
     let mut vec = Vec::new();
     let list = apply_args.args();
     let mut size = 0;
-    if (list.data().len() == 2) {
+    if (list.len() == 2) {
         if let Number(s) = list.car() {
             size = s.abs();
             let v = list.cdr().car();
@@ -15,7 +15,7 @@ fn make_vector(apply_args: &mut ApplyArgs) -> LispType {
         } else {
             panic!("make-vector: invalid argument");
         }
-    } else if (list.data().len() == 1) {
+    } else if (list.len() == 1) {
         if let Number(s) = list.car() {
             size = s.abs();
         } else {
@@ -44,13 +44,13 @@ fn is_vector(apply_args: &mut ApplyArgs) -> LispType {
 
 fn vector_length(apply_args: &mut ApplyArgs) -> LispType {
     let list = apply_args.args();
-    let size = list.data().len();
+    let size = list.len();
     Number(size as i32)
 }
 
 fn vector_ref(apply_args: &mut ApplyArgs) -> LispType {
     let list = apply_args.args();
-    if (list.data().len() == 2) {
+    if (list.len() == 2) {
         if let Vector(l, s) = list.car() {
             let index = list.cdr().car();
             if let Number(i) = index {
@@ -74,7 +74,7 @@ fn vector_ref(apply_args: &mut ApplyArgs) -> LispType {
 
 fn vector_set(apply_args: &mut ApplyArgs) -> LispType {
     let list = apply_args.args();
-    if (list.data().len() == 3) {
+    if (list.len() == 3) {
         if let Vector(l, s) = list.car() {
             let index = list.cdr().car();
             if let Number(i) = index {
@@ -99,7 +99,7 @@ fn vector_set(apply_args: &mut ApplyArgs) -> LispType {
 
 fn vector_fill(apply_args: &mut ApplyArgs) -> LispType {
     let list = apply_args.args();
-    if (list.data().len() == 2) {
+    if (list.len() == 2) {
         if let Vector(l, s) = list.car() {
             let v = list.cdr().car();
             for i in 0..s {
