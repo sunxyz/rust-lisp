@@ -194,6 +194,60 @@ fn string_copy(apply_args: &mut ApplyArgs) -> LispType {
     }
 }
 
+fn string_find(apply_args: &mut ApplyArgs) -> LispType {
+    let list = apply_args.args();
+    if (list.len() != 3) {
+        panic!("string-find: wrong number of arguments");
+    }
+    let arg = list.car();
+    if let Strings(s) = arg {
+        let str = list.cdr().car();
+        if let Strings(c) = str {
+           s.find(c.as_str()).map(|n| Number(n as i32)).unwrap_or(Number(-1))
+        } else {
+            panic!("string-find: not a string");
+        }
+    } else {
+        panic!("string-find: not a string");
+    }
+}
+
+fn string_trim(apply_args: &mut ApplyArgs) -> LispType {
+    let list = apply_args.args();
+    if (list.len() != 1) {
+        panic!("string-trim: wrong number of arguments");
+    }
+    let arg = list.car();
+    if let Strings(s) = arg {
+        Strings(s.trim().to_string())
+    } else {
+        panic!("string-trim: not a string");
+    }
+}
+
+fn string_replace(apply_args: &mut ApplyArgs) -> LispType {
+    let list = apply_args.args();
+    if (list.len() != 3) {
+        panic!("string-replace: wrong number of arguments");
+    }
+    let arg = list.car();
+    if let Strings(s) = arg {
+        let str = list.cdr().car();
+        if let Strings(c) = str {
+            let new = list.cdr().cdr().car();
+            if let Strings(n) = new {
+                Strings(s.replace(c.as_str(), n.as_str()))
+            } else {
+                panic!("string-replace: not to string");
+            }
+        } else {
+            panic!("string-replace: not from string");
+        }
+    } else {
+        panic!("string-replace: not source string");
+    }
+}
+
 fn string2list(apply_args: &mut ApplyArgs) -> LispType {
     let list = apply_args.args();
     if (list.len() != 1) {
@@ -279,6 +333,9 @@ pub fn reg_procedure(env: &mut Env) {
     env.reg_procedure("substring", substring);
     env.reg_procedure("string-append", string_append);
     env.reg_procedure("string-copy", string_copy);
+    env.reg_procedure("string-find", string_find);
+    env.reg_procedure("string-trim", string_trim);
+    env.reg_procedure("string-replace", string_replace);
     env.reg_procedure("string->list", string2list);
     env.reg_procedure("string->symbol", string2symbol);
     env.reg_procedure("string->vector", string2vector);
