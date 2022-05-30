@@ -46,7 +46,7 @@ fn let_x(apply_args: &mut ApplyArgs) -> LispType {
         for elem in l.data() {
             if let Expr(kv) = elem {
                 if (kv.data().len() != 2) {
-                    panic!("let_: invalid argument");
+                    panic!("let*: invalid argument");
                 } else {
                     let key = kv.car();
                     let value = kv.cdr().car().clone();
@@ -54,15 +54,15 @@ fn let_x(apply_args: &mut ApplyArgs) -> LispType {
                         let v = apply_args.inter(&value);
                         apply_args.env().define(&s, v);
                     } else {
-                        panic!("let: invalid argument");
+                        panic!("let*: invalid argument");
                     }
                 }
             } else {
-                panic!("let: invalid argument");
+                panic!("let*: invalid argument");
             }
         }
     } else {
-        panic!("let: not a list");
+        panic!("let*: not a list");
     }
     apply_args.inter(&Expr(body));
     apply_args.env().kill();

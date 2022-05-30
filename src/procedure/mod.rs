@@ -13,6 +13,7 @@ mod define_macro;
 mod io;
 mod load;
 mod eval;
+mod boolean;
 
 use crate::env::{Env, EnvOps};
 use crate::t::LispType::*;
