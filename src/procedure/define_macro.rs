@@ -20,6 +20,7 @@ fn define_macro(apply_args: &mut ApplyArgs) -> LispType {
                 ]);
                 // println!("define-macro: {} => {}", args, expr);
                 let template = x.inter(&Expr(expr));
+                // println!("define-macro template:=> {}", template);
                 x.inter(&template)
             })));
             apply_args.env().borrow_mut().define(&var, proc);
@@ -34,8 +35,16 @@ fn define_macro(apply_args: &mut ApplyArgs) -> LispType {
 }
 
 fn render(apply_args: &mut ApplyArgs) -> LispType {
-    let t = render0(&apply_args.expr().clone(), apply_args);
-    Expr(t)
+    if (apply_args.expr().len() != 1) {
+        panic!("render: invalid args");
+    }
+    let car = apply_args.expr().car();
+    if let Expr(list) = car {
+        let t = render0(&list, apply_args);
+        Expr(t)
+    } else {
+        car
+    }
 }
 
 fn render0(exp: &List, apply_args: &mut ApplyArgs) -> List {
@@ -60,7 +69,7 @@ fn render0(exp: &List, apply_args: &mut ApplyArgs) -> List {
                 list.push(Symbol(k.clone()));
             }
         } else if let Expr(l) = elem {
-            list.push_all(render0(&l, apply_args));
+            list.push(Expr(render0(&l, apply_args)));
         } else {
             list.push(elem);
         }
