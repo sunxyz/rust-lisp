@@ -39,26 +39,27 @@ impl ProcedureRegister for Env {
 
 pub fn init_procedure(env: &mut Env) {
     number::reg_procedure(env);
+    boolean::reg_procedure(env);
+    char::reg_procedure(env);
+    symbol::reg_procedure(env);
+    string::reg_procedure(env);
+    cons::reg_procedure(env);
+    list::reg_procedure(env);
+    vector::reg_procedure(env);
+    quote::reg_procedure(env);
+    procedure::reg_procedure(env);
+    nil::reg_procedure(env);
+    type_::reg_procedure(env);
+
     define::reg_procedure(env);
     let_::reg_procedure(env);
     set::reg_procedure(env);
     lambda::reg_procedure(env);
     branch::reg_procedure(env);
-    cons::reg_procedure(env);
-    vector::reg_procedure(env);
-    list::reg_procedure(env);
-    quote::reg_procedure(env);
     apply::reg_procedure(env);
     define_macro::reg_procedure(env);
     io::reg_procedure(env);
     load::reg_procedure(env);
     eval::reg_procedure(env);
-    boolean::reg_procedure(env);
-    string::reg_procedure(env);
-    symbol::reg_procedure(env);
-    char::reg_procedure(env);
-    procedure::reg_procedure(env);
-    type_::reg_procedure(env);
-    nil::reg_procedure(env);
     lazy_evaluation::reg_procedure(env);
 }

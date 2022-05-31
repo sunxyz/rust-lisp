@@ -60,6 +60,6 @@ pub fn reg_procedure(env: &mut Env) {
     env.reg_procedure("cons", cons);
     env.reg_procedure("car", car);
     env.reg_procedure("cdr", cdr);
-    env.reg_procedure("set_car", set_car);
-    env.reg_procedure("set_cdr", set_cdr);
+    env.reg_procedure("set-car!", set_car);
+    env.reg_procedure("set-cdr!", set_cdr);
 }

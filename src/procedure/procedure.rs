@@ -13,4 +13,5 @@ fn is_procedure(apply_args: &mut ApplyArgs) -> LispType {
 
 pub fn reg_procedure(env: &mut Env) {
     env.reg_procedure("procedure?", is_procedure);
+    env.reg_procedure("method?", is_procedure);
 }
