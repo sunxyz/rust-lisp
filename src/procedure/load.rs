@@ -7,7 +7,7 @@ fn load(apply_args: &mut ApplyArgs) -> LispType {
     apply_args.args().clone().for_each(|arg| {
         let mut contents = "".to_string();
         if let Strings(filename) = arg {
-            read_file("./Cargo.toml").split("\n").for_each(|line| {
+            read_file(&filename).split("\n").for_each(|line| {
                 let line = line.trim();
                 if line.starts_with("//") {
                     return;

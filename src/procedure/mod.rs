@@ -22,7 +22,7 @@ mod type_;
 mod nil;
 mod lazy_evaluation;
 
-use crate::env::{Env, EnvOps};
+use crate::env::{Env, EnvOps, RefEnv};
 use crate::t::LispType::*;
 use crate::t::*;
 use std::rc::Rc;
@@ -33,10 +33,7 @@ trait ProcedureRegister {
 
 impl ProcedureRegister for Env {
     fn reg_procedure(&mut self, name: &str, proc: fn(&mut ApplyArgs) -> LispType) {
-        self.define(
-            name,
-            Procedure(Rc::new(Box::new(proc))),
-        );
+        self.define(name, Procedure(Rc::new(Box::new(proc))));
     }
 }
 

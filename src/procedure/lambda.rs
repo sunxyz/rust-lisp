@@ -3,8 +3,9 @@ use super::*;
 fn lambda(apply_args: &mut ApplyArgs, lazy_eval: bool) -> Box<dyn Fn(&mut ApplyArgs) -> LispType> {
     if let Expr(args_name) = apply_args.expr().car() {
         let body = Expr(apply_args.expr().cdr());
+        let e = apply_args.env();
         Box::new(move |x| {
-            x.env().fork();
+            let env = Env::extend(e.clone());
             if (!args_name.is_nil()) {
                 bind_args(
                     args_name.clone(),
@@ -13,19 +14,17 @@ fn lambda(apply_args: &mut ApplyArgs, lazy_eval: bool) -> Box<dyn Fn(&mut ApplyA
                     } else {
                         x.args().clone()
                     },
-                    x.env(),
+                    env.clone(),
                 );
             }
-            let v = x.inter(&body);
-            x.env().kill();
-            v
+            x.inter_4_env(&body, env)
         })
     } else {
         panic!("lambda: args is not list");
     }
 }
 
-fn bind_args(args_name: List, args_val: List, env: &mut Env) {
+fn bind_args(args_name: List, args_val: List, env: RefEnv) {
     println!("bind_args: {} : {}", args_name, args_val);
     let mut next = true;
     let mut args_name = args_name.clone();
@@ -39,7 +38,7 @@ fn bind_args(args_name: List, args_val: List, env: &mut Env) {
                     if (args_name.len() == 2) {
                         let key = args_name.cdr().car().clone();
                         if let Symbol(name) = key {
-                            env.define(name.as_str(), Expr(args_val.clone()));
+                            env.borrow_mut().define(name.as_str(), Expr(args_val.clone()));
                             println!("key:{} v:{}", name, args_val);
                         } else {
                             panic!("lambda: bind_args: key is not symbol");
@@ -50,7 +49,7 @@ fn bind_args(args_name: List, args_val: List, env: &mut Env) {
                     }
                 } else {
                     println!("{}:{}", name, v);
-                    env.define(name.as_str(), v.clone());
+                    env.borrow_mut().define(name.as_str(), v.clone());
                 }
             }
             _ => {

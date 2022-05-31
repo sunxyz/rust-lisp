@@ -111,7 +111,7 @@ fn string_set(apply_args: &mut ApplyArgs) -> LispType {
                         .collect(),
                 );
                 if let Symbol(var) = apply_args.expr().car() {
-                    apply_args.env().set(&var, v);
+                    apply_args.env().borrow_mut().set(&var, v);
                     Nil
                 } else {
                     panic!("string-set!: not a symbol");
@@ -203,7 +203,9 @@ fn string_find(apply_args: &mut ApplyArgs) -> LispType {
     if let Strings(s) = arg {
         let str = list.cdr().car();
         if let Strings(c) = str {
-           s.find(c.as_str()).map(|n| Number(n as i32)).unwrap_or(Number(-1))
+            s.find(c.as_str())
+                .map(|n| Number(n as i32))
+                .unwrap_or(Number(-1))
         } else {
             panic!("string-find: not a string");
         }

@@ -9,19 +9,20 @@ fn define_macro(apply_args: &mut ApplyArgs) -> LispType {
         let proc = list.cdr().car();
         println!("define-macro: {}", var);
         if let Procedure(_) = apply_args.inter(&proc) {
-           
-            apply_args.env().define(
-                &var,
-                Procedure(Rc::new(Box::new(move |x| {
-                    let mut expr = List::new();
-                    let mut args = List::new();
-                    args.push_vec(vec![Symbol("'".to_string()), Expr(x.expr().clone())]);
-                    expr.push_vec(vec![Symbol("apply".to_string()), proc.clone(), Expr(args.clone())]);
-                    println!("define-macro: {} => {}", args, expr);
-                    let template = x.inter(&Expr(expr));
-                    x.inter(&template)
-                }))),
-            );
+            let proc = Procedure(Rc::new(Box::new(move |x| {
+                let mut expr = List::new();
+                let mut args = List::new();
+                args.push_vec(vec![Symbol("'".to_string()), Expr(x.expr().clone())]);
+                expr.push_vec(vec![
+                    Symbol("apply".to_string()),
+                    proc.clone(),
+                    Expr(args.clone()),
+                ]);
+                println!("define-macro: {} => {}", args, expr);
+                let template = x.inter(&Expr(expr));
+                x.inter(&template)
+            })));
+            apply_args.env().borrow_mut().define(&var, proc);
         } else {
             panic!("define-macro: invalid proc");
         }
@@ -40,7 +41,7 @@ fn render(apply_args: &mut ApplyArgs) -> LispType {
 fn render0(exp: &List, apply_args: &mut ApplyArgs) -> List {
     let mut list = List::new();
     for elem in exp.clone() {
-        println!("elem:{}",elem);
+        println!("elem:{}", elem);
         if let Symbol(k) = elem {
             if let Some(0) = k.find(",@") {
                 println!("render: ,@");

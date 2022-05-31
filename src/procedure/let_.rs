@@ -5,17 +5,18 @@ fn let_(apply_args: &mut ApplyArgs) -> LispType {
     let list = apply_args.expr();
     let let_x = list.car();
     let body = list.cdr();
-    let mut lex_env = HashMap::new();
+    let env = Env::extend(apply_args.env());
     if let Expr(l) = let_x {
         for elem in l {
             if let Expr(kv) = elem {
                 if (kv.len() != 2) {
-                    panic!("let_: invalid argument");
+                    panic!("let: invalid argument");
                 } else {
                     let key = kv.car();
                     let value = kv.cdr().car().clone();
                     if let Symbol(s) = key {
-                        lex_env.insert(s, apply_args.inter(&value));
+                        let v = apply_args.inter(&value);
+                        env.borrow_mut().define(&s, v);
                     } else {
                         panic!("let: invalid argument");
                     }
@@ -27,21 +28,14 @@ fn let_(apply_args: &mut ApplyArgs) -> LispType {
     } else {
         panic!("let: not a list");
     }
-    apply_args.env().fork();
-    for (k, v) in lex_env.iter() {
-        apply_args.env().define(k, v.clone());
-    }
-    apply_args.inter(&Expr(body));
-    apply_args.env().kill();
-
-    Nil
+    apply_args.inter_4_env(&Expr(body), env)
 }
 
 fn let_x(apply_args: &mut ApplyArgs) -> LispType {
     let list = apply_args.expr();
     let let_x = list.car();
     let body = list.cdr();
-    apply_args.env().fork();
+    let env = Env::extend(apply_args.env());
     if let Expr(l) = let_x {
         for elem in l {
             if let Expr(kv) = elem {
@@ -51,8 +45,8 @@ fn let_x(apply_args: &mut ApplyArgs) -> LispType {
                     let key = kv.car();
                     let value = kv.cdr().car().clone();
                     if let Symbol(s) = key {
-                        let v = apply_args.inter(&value);
-                        apply_args.env().define(&s, v);
+                        let v = apply_args.inter_4_env(&value, env.clone());
+                        env.borrow_mut().define(&s, v);
                     } else {
                         panic!("let*: invalid argument");
                     }
@@ -64,10 +58,7 @@ fn let_x(apply_args: &mut ApplyArgs) -> LispType {
     } else {
         panic!("let*: not a list");
     }
-    apply_args.inter(&Expr(body));
-    apply_args.env().kill();
-
-    Nil
+    apply_args.inter_4_env(&Expr(body), env)
 }
 
 pub fn reg_procedure(env: &mut Env) {

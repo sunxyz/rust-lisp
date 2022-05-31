@@ -1,68 +1,77 @@
-use super::t::*;
+use crate::t::LispType;
+use std::cell::RefCell;
 use std::collections::HashMap;
-use std::fmt::{Display, Formatter, Result};
+use std::rc::Rc;
 
-// 单线程版本
-pub struct Env(Vec<HashMap<String, LispType>>);
+pub type RefEnv = Rc<RefCell<Env>>;
+
+pub enum Env {
+    Empty,
+    Extend {
+        parent: RefEnv,
+        env: HashMap<String, LispType>,
+    },
+}
 
 pub trait EnvOps {
-    fn new() -> Self;
+    fn root() -> RefEnv;
+    fn extend(parent: RefEnv) -> RefEnv;
     fn get(&self, key: &str) -> Option<LispType>;
     fn set(&mut self, key: &str, value: LispType);
     fn define(&mut self, key: &str, value: LispType);
-    fn fork(&mut self);
-    fn kill(&mut self);
 }
 
 impl EnvOps for Env {
-    
-    fn new() -> Self {
-        Env(vec![HashMap::new()])
+    fn root() -> RefEnv {
+        ref_env_of(Env::Extend {
+            parent: ref_env_of(Env::Empty),
+            env: HashMap::new(),
+        })
+    }
+
+    fn extend(parent: RefEnv) -> RefEnv {
+        ref_env_of(Env::Extend {
+            parent: parent.clone(),
+            env: HashMap::new(),
+        })
     }
 
     fn get(&self, key: &str) -> Option<LispType> {
-        // println!("get key: {}, env deep: {}", key, self.0.len());
-        for map in self.0.iter().rev() {
-            if let Some(value) = map.get(key) {
-                return Some(value.clone());
+        match self {
+            Env::Empty => None,
+            Env::Extend { parent, env, .. } => {
+                if let Some(v) = env.get(key) {
+                    Some(v.clone())
+                } else {
+                    parent.borrow().get(key)
+                }
             }
         }
-        None
     }
 
     fn set(&mut self, key: &str, value: LispType) {
-        for map in &mut self.0 {
-            if map.contains_key(key) {
-                map.insert(key.to_string(), value.clone());
-                return;
+        match self {
+            Env::Empty => panic!("set: undefined key: {}", key),
+            Env::Extend { parent, env, .. } => {
+                if(env.contains_key(key)){
+                    env.insert(key.to_string(), value);
+                } else{
+                    parent.borrow_mut().set(key, value);
+                }
             }
         }
-        panic!("{} is not defined", key);
     }
 
     fn define(&mut self, key: &str, value: LispType) {
-        let has_define = self.0.last_mut().unwrap().contains_key(key);
-        if (has_define) {
-            panic!("{} is already defined", key);
-        } else {
-            self.0
-                .last_mut()
-                .unwrap()
-                .insert(key.to_string(), value.clone());
+        match self {
+            Env::Empty => panic!("define: empty env"),
+            Env::Extend { parent, env, .. } => {
+                env.insert(key.to_string(), value);
+            }
         }
-    }
-
-    fn fork(&mut self) {
-        self.0.push(HashMap::new());
-    }
-
-    fn kill(&mut self) {
-        self.0.pop();
     }
 }
 
-impl Display for Env {
-    fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
-        write!(f, "Env {}", self.0.len())
-    }
+fn ref_env_of(env: Env) -> RefEnv {
+    Rc::new(RefCell::new(env))
 }

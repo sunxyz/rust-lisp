@@ -12,12 +12,16 @@
 
 mod env;
 mod interpreter;
-mod parse;
+mod parser;
 mod procedure;
 mod t;
+mod utils;
+
+
 use interpreter::eval;
 use t::LispType;
 fn main() {
+   
     // let s = Rc::new(RefCell::new("我很善变，还拥有多个主人".to_string()));
 
     // let s1 = s.clone();
@@ -41,7 +45,8 @@ fn main() {
     // println!("{}", r.cdr());
 
     // let r = eval("( (define a (lambda (x) (+ x 8))) (a 8))");
-    let r = eval("((define a (lambda (x) (x))) (apply a (' (+ 1 3 5 7)))))");
+    // let r = eval("((define a (lambda (x) (x))) (apply a (' ( 1 3 5 7)))))");
+    let r = eval("(load 'test.lisp')");
     println!("{}", r.ok().unwrap());
 
     // let mut j = [1] ;
@@ -66,3 +71,65 @@ fn main() {
 }
 
 
+// type RefEnv = Rc<RefCell<Env>>;
+
+// pub enum Env{
+//     Empty,
+//     Extend{
+//         parent: RefEnv,
+//         env: HashMap<String, LispType>,
+//     },
+// }
+
+// pub trait EnvOps {
+//     fn extend(parent: RefEnv) -> RefEnv;
+//     fn get(&self, key: &str) -> Option<LispType>;
+//     fn set(&mut self, key: &str, value: LispType);
+//     fn define(&mut self, key: &str, value: LispType);
+// }
+
+// impl EnvOps for Env {
+   
+//     fn extend(parent: RefEnv) -> RefEnv {
+//         ref_env_of(Env::Extend{
+//             parent: parent.clone(),
+//             env: HashMap::new(),
+//         })
+//     }
+
+//     fn get(&self, key: &str) -> Option<LispType> {
+//         match self {
+//             Env::Empty => None,
+//             Env::Extend{parent, env, ..} => {
+//                 if let Some(v) = env.get(key) {
+//                     Some(v.clone())
+//                 }else {
+//                     parent.borrow().get(key)
+//                 }
+//             }
+//         }
+//     }
+
+//     fn set(&mut self, key: &str, value: LispType) {
+//         match self {
+//             Env::Empty => panic!("set: empty env"),
+//             Env::Extend{parent, env, ..} => {
+//                 env.insert(key.to_string(), value);
+//             }
+//         }
+//     }
+
+//     fn define(&mut self, key: &str, value: LispType) {
+//         match self {
+//             Env::Empty => panic!("define: empty env"),
+//             Env::Extend{parent, env, ..} => {
+//                 env.insert(key.to_string(), value);
+//             }
+//         }
+//     }
+
+// }
+
+// pub fn ref_env_of(env:Env) -> RefEnv{
+//     Rc::new(RefCell::new(env))
+// }

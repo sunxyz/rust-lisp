@@ -1,24 +1,26 @@
 use super::*;
 use crate::env::Env;
+use crate::env::EnvOps;
+use crate::env::RefEnv;
 use crate::t::LispType::*;
 use std::cell::RefCell;
 use std::rc::Rc;
 
-pub struct ApplyArgs<'a> {
+pub struct ApplyArgs{
     expr: List,
     args: Option<List>,
-    lazy_args: fn(List, &mut Env) -> List,
-    inter: fn(&LispType, &mut Env) -> LispType,
-    env: &'a mut Env,
+    lazy_args: fn(List, RefEnv) -> List,
+    inter: fn(&LispType, RefEnv) -> LispType,
+    env: RefEnv,
 }
 
-impl<'a> ApplyArgs<'a> {
+impl ApplyArgs {
     pub fn new(
         expr: List,
         args: Option<List>,
-        lazy_args: fn(List, &mut Env) -> List,
-        inter: fn(&LispType, &mut Env) -> LispType,
-        env: &'a mut Env,
+        lazy_args: fn(List, RefEnv) -> List,
+        inter: fn(&LispType, RefEnv) -> LispType,
+        env: RefEnv,
     ) -> Self {
         ApplyArgs {
             expr,
@@ -30,7 +32,7 @@ impl<'a> ApplyArgs<'a> {
     }
 
     pub fn clone_of(&mut self, args: Option<List>) -> ApplyArgs {
-        ApplyArgs::new(List::new(), args, |l, v| List::new(), self.inter, self.env)
+        ApplyArgs::new(List::new(), args, |l, v| List::new(), self.inter, self.env.clone())
     }
 
     pub fn expr(&self) -> &List {
@@ -40,7 +42,7 @@ impl<'a> ApplyArgs<'a> {
     pub fn args(&mut self) -> &List {
         if let None = self.args {
             let lazy_f = self.lazy_args;
-            let v = lazy_f(self.expr().clone(), self.env);
+            let v = lazy_f(self.expr().clone(), self.env.clone());
             // println!("args is None exp: {} => {}", self.expr(), v);
             self.args = Some(v);
         }
@@ -48,12 +50,17 @@ impl<'a> ApplyArgs<'a> {
     }
 
     pub fn inter(&mut self, exp: &LispType) -> LispType {
-        let e: fn(&LispType, &mut Env) -> LispType = self.inter;
-        e(exp, self.env)
+        let e = self.inter;
+        e(exp, self.env.clone())
     }
 
-    pub fn env(&mut self) -> &mut Env {
-        self.env
+    pub fn inter_4_env(&mut self, exp: &LispType, env:RefEnv) -> LispType {
+        let e = self.inter;
+        e(exp, env)
+    }
+
+    pub fn env(&mut self) -> RefEnv {
+        self.env.clone()
     }
 
     pub fn apply(&mut self) -> LispType {
