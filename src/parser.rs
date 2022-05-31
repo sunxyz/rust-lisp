@@ -4,7 +4,7 @@ static PREFIX: &'static str = "(";
 static SUFFIX: &'static str = ")";
 
 pub fn parser(exp: String) -> Result<List, String> {
-    Ok(parse0(exp))
+    Ok(parse0(exp.replace("\"", "'")))
 }
 
 fn parse0(exp: String) -> List {

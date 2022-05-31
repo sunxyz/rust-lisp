@@ -37,6 +37,15 @@ cargo build --release
 ```
 cd ./target/release
 ```
+**run**
 ```
 ./rust-lisp run ./aa.lisp 
+```
+**cmd**
+```
+./rust-lisp cmd 
+```
+or
+```
+./rust-lisp 
 ```
