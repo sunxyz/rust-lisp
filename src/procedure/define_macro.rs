@@ -7,7 +7,7 @@ fn define_macro(apply_args: &mut ApplyArgs) -> LispType {
     }
     if let Symbol(var) = list.car() {
         let proc = list.cdr().car();
-        println!("define-macro: {}", var);
+        // println!("define-macro: {}", var);
         if let Procedure(_) = apply_args.inter(&proc) {
             let proc = Procedure(Rc::new(Box::new(move |x| {
                 let mut expr = List::new();
@@ -18,7 +18,7 @@ fn define_macro(apply_args: &mut ApplyArgs) -> LispType {
                     proc.clone(),
                     Expr(args.clone()),
                 ]);
-                println!("define-macro: {} => {}", args, expr);
+                // println!("define-macro: {} => {}", args, expr);
                 let template = x.inter(&Expr(expr));
                 x.inter(&template)
             })));
@@ -41,10 +41,10 @@ fn render(apply_args: &mut ApplyArgs) -> LispType {
 fn render0(exp: &List, apply_args: &mut ApplyArgs) -> List {
     let mut list = List::new();
     for elem in exp.clone() {
-        println!("elem:{}", elem);
+        // println!("elem:{}", elem);
         if let Symbol(k) = elem {
             if let Some(0) = k.find(",@") {
-                println!("render: ,@");
+                // println!("render: ,@");
                 let name = k.clone().replace(",@", "");
                 let v = apply_args.inter(&Symbol(name));
                 if let Expr(l) = v {

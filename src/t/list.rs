@@ -130,10 +130,3 @@ impl Iterator for List {
         }
     }
 }
-
-
-fn t (l : List){
-    for i in l{
-        println!("{}",i);
-    }
-}

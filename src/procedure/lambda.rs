@@ -25,7 +25,7 @@ fn lambda(apply_args: &mut ApplyArgs, lazy_eval: bool) -> Box<dyn Fn(&mut ApplyA
 }
 
 fn bind_args(args_name: List, args_val: List, env: RefEnv) {
-    println!("bind_args: {} : {}", args_name, args_val);
+    // println!("bind_args: {} : {}", args_name, args_val);
     let mut next = true;
     let mut args_name = args_name.clone();
     let mut args_val = args_val.clone();
@@ -39,7 +39,7 @@ fn bind_args(args_name: List, args_val: List, env: RefEnv) {
                         let key = args_name.cdr().car().clone();
                         if let Symbol(name) = key {
                             env.borrow_mut().define(name.as_str(), Expr(args_val.clone()));
-                            println!("key:{} v:{}", name, args_val);
+                            // println!("key:{} v:{}", name, args_val);
                         } else {
                             panic!("lambda: bind_args: key is not symbol");
                         }
@@ -48,7 +48,7 @@ fn bind_args(args_name: List, args_val: List, env: RefEnv) {
                         panic!("lambda: wrong number of arguments");
                     }
                 } else {
-                    println!("{}:{}", name, v);
+                    // println!("{}:{}", name, v);
                     env.borrow_mut().define(name.as_str(), v.clone());
                 }
             }

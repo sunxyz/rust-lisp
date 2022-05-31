@@ -31,14 +31,12 @@
 * [ ] more can be implemented through macros 
 
 ## use
-
 ```
-alias r-lisp rust-lisp
+cargo build --release
 ```
 ```
-r-lisp run ./xx.lisp 
+cd ./target/release
 ```
-
 ```
-r-lisp proc (load "./xx.lisp") 
+./rust-lisp run ./aa.lisp 
 ```
