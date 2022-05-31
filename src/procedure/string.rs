@@ -168,7 +168,7 @@ fn string_append(apply_args: &mut ApplyArgs) -> LispType {
     let last = list.cdr();
     if let Strings(s) = s {
         let mut result = s.clone();
-        for arg in last {
+        for arg in last.data() {
             if let Strings(s) = arg {
                 result.push_str(&s);
             } else {

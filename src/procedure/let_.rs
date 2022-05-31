@@ -7,7 +7,7 @@ fn let_(apply_args: &mut ApplyArgs) -> LispType {
     let body = list.cdr();
     let env = Env::extend(apply_args.env());
     if let Expr(l) = let_x {
-        for elem in l {
+        for elem in l.data() {
             if let Expr(kv) = elem {
                 if (kv.len() != 2) {
                     panic!("let: invalid argument");
@@ -37,7 +37,7 @@ fn let_x(apply_args: &mut ApplyArgs) -> LispType {
     let body = list.cdr();
     let env = Env::extend(apply_args.env());
     if let Expr(l) = let_x {
-        for elem in l {
+        for elem in l.data() {
             if let Expr(kv) = elem {
                 if (kv.len() != 2) {
                     panic!("let*: invalid argument");

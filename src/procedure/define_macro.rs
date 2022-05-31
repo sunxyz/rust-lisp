@@ -49,7 +49,7 @@ fn render(apply_args: &mut ApplyArgs) -> LispType {
 
 fn render0(exp: &List, apply_args: &mut ApplyArgs) -> List {
     let mut list = List::new();
-    for elem in exp.clone() {
+    for elem in exp.data() {
         // println!("elem:{}", elem);
         if let Symbol(k) = elem {
             if let Some(0) = k.find(",@") {
