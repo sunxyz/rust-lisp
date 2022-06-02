@@ -95,8 +95,8 @@ fn set_cdr(apply_args: &mut ApplyArgs) -> LispType {
 }
 
 pub fn reg_procedure(env: &mut Env) {
-    env.reg_procedure("cons?", is_cons);
-    env.reg_procedure("cons=?", cons_eq);
+    env.reg_procedure("pair?", is_cons);
+    env.reg_procedure("pair=?", cons_eq);
     env.reg_procedure("cons", cons);
     env.reg_procedure("car", car);
     env.reg_procedure("cdr", cdr);
