@@ -13,7 +13,7 @@ fn load(apply_args: &mut ApplyArgs) -> LispType {
                     return;
                 }
                 if (!(line.starts_with(";") || line.starts_with("#"))) {
-                    contents.push_str(line);
+                    contents.push_str(format!(" {}",line).as_str());
                 }
             });
         }else {
