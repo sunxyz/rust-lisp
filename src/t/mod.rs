@@ -1,3 +1,4 @@
+mod cons_;
 mod func;
 mod list;
 
@@ -7,6 +8,7 @@ use std::fmt::Formatter;
 use std::fmt::Result;
 use std::rc::Rc;
 
+pub use self::cons_::Cons_;
 pub use self::func::ApplyArgs;
 pub use self::list::List;
 
@@ -19,7 +21,7 @@ pub enum LispType {
     Nil,
     Expr(List),
     Procedure(Rc<Box<dyn Fn(&mut ApplyArgs) -> LispType>>),
-    Cons(Rc<RefCell<Vec<LispType>>>),
+    Cons(Cons_),
     Vector(Rc<RefCell<Vec<LispType>>>, usize),
 }
 
@@ -51,12 +53,7 @@ impl Display for LispType {
             LispType::Nil => write!(f, "nil"),
             LispType::Expr(l) => write!(f, "{}", l),
             LispType::Procedure(_) => write!(f, "<procedure>"),
-            LispType::Cons(c) => write!(
-                f,
-                "({} {})",
-                c.borrow().get(0).unwrap(),
-                c.borrow().get(1).unwrap()
-            ),
+            LispType::Cons(c) => write!(f, "{}", &c.to_string()),
             LispType::Vector(v, _) => write!(
                 f,
                 "#({})",
@@ -106,7 +103,7 @@ impl PartialEq for LispType {
                 _ => false,
             },
             LispType::Cons(c) => match other {
-                LispType::Cons(m) => c == m,
+                LispType::Cons(m) => c.eq(m),
                 _ => false,
             },
             LispType::Vector(v, l) => match other {
@@ -117,8 +114,8 @@ impl PartialEq for LispType {
     }
 }
 impl LispType {
-    pub fn cons_of(car:LispType, cdr:LispType) -> LispType {
-        LispType::Cons(Rc::new(RefCell::new(vec![car, cdr])))
+    pub fn cons_of(car: LispType, cdr: LispType) -> LispType {
+        Cons_::new(car, cdr)
     }
 }
 // pub use self::atom::*;

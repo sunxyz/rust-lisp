@@ -66,7 +66,11 @@ impl EnvOps for Env {
         match self {
             Env::Empty => panic!("define: empty env"),
             Env::Extend { parent, env, .. } => {
-                env.insert(key.to_string(), value);
+                if(env.contains_key(key)){
+                   println!("\x1b[31m{} is already defined\x1b[0m", key);
+                } else{
+                    env.insert(key.to_string(), value);
+                }
             }
         }
     }
