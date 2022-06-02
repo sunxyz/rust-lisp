@@ -78,7 +78,7 @@ fn apply(
 ) -> LispType {
     let lazy_args_f: fn(List, RefEnv) -> List = |exp, e| {
         let mut t = List::new();
-        for l in exp.clone() {
+        for l in exp.data() {
             t.push(interpreter0(&l, e.clone()));
         }
         t

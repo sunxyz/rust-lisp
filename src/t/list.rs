@@ -60,7 +60,7 @@ impl List {
     }
 
     pub fn push_all(&mut self, elem: List) {
-        self.0.borrow_mut().extend(elem);
+        self.0.borrow_mut().extend(elem.data());
     }
 
     pub fn len(&self) -> usize {
@@ -118,15 +118,15 @@ impl PartialEq for List {
     }
 }
 
-impl Iterator for List {
-    type Item = LispType;
+// impl Iterator for List {
+//     type Item = LispType;
 
-    fn next(&mut self) -> Option<Self::Item> {
-        if self.is_nil() {
-            None
-        } else {
-            let t = self.0.borrow_mut().remove(0);
-            Some(t)
-        }
-    }
-}
+//     fn next(&mut self) -> Option<Self::Item> {
+//         if self.is_nil() {
+//             None
+//         } else {
+//             let t = self.0.borrow_mut().remove(0);
+//             Some(t)
+//         }
+//     }
+// }

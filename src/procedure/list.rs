@@ -124,7 +124,7 @@ fn append(apply_args: &mut ApplyArgs) -> LispType {
     let args = list.cdr();
     if let Expr(r) = result {
         let mut r = r.clone();
-        args.for_each(|arg| {
+        args.data().iter().for_each(|arg| {
             if let Expr(l) = arg {
                 r.push_all(l.clone());
             } else {
@@ -227,7 +227,7 @@ fn filter(apply_args: &mut ApplyArgs) -> LispType {
             if (l.len() == 0) {
                 return Expr(result);
             } else {
-                for elem in l {
+                for elem in l.data() {
                     if is_true(&proc(
                         &mut apply_args.clone_of(Some(List::of(vec![elem.clone()]))),
                     )) {
@@ -257,7 +257,7 @@ fn reduce(apply_args: &mut ApplyArgs) -> LispType {
             if (l.len() == 0) {
                 return result.clone();
             } else {
-                for elem in l {
+                for elem in l.data() {
                     result = proc(
                         &mut apply_args
                             .clone_of(Some(List::of(vec![result.clone(), elem.clone()]))),

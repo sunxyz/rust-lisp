@@ -94,14 +94,19 @@ fn eq(apply_args: &mut ApplyArgs) -> LispType {
     calc(apply_args, |a, b| if a == b { 1 } else { 0 })
 }
 
+fn mod_(apply_args: &mut ApplyArgs) -> LispType {
+    calc(apply_args, |a, b| a  % b)
+}
+
 fn calc(apply_args: &mut ApplyArgs, f: fn(i32, i32) -> i32) -> LispType {
     Number(
         apply_args
             .args()
-            .clone()
+            .data()
+            .iter()
             .map(|x| -> i32 {
                 match x {
-                    LispType::Number(i) => i,
+                    LispType::Number(i) => *i,
                     v => panic!("{} not a number", v),
                 }
             })
@@ -119,6 +124,7 @@ pub fn reg_procedure(env: &mut Env) {
     env.reg_procedure("-", subtract);
     env.reg_procedure("*", multiply);
     env.reg_procedure("/", divide);
+    env.reg_procedure("%", mod_);
     env.reg_procedure("<", less_than);
     env.reg_procedure("<=", less_than_or_equal);
     env.reg_procedure(">", greater_than);
