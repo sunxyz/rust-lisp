@@ -6,6 +6,9 @@ use std::cell::RefCell;
 use std::fmt::Display;
 use std::fmt::Formatter;
 use std::fmt::Result;
+use std::fs::File;
+use std::io::Read;
+use std::io::Write;
 use std::rc::Rc;
 
 pub use self::cons_::Cons_;
@@ -23,6 +26,8 @@ pub enum LispType {
     Procedure(Rc<Box<dyn Fn(&mut ApplyArgs) -> LispType>>),
     Cons(Cons_),
     Vector(Rc<RefCell<Vec<LispType>>>, usize),
+    Input(Rc<RefCell<Box<dyn Read>>>),
+    Output(Rc<RefCell<Box<dyn Write>>>),
 }
 
 impl Clone for LispType {
@@ -38,6 +43,8 @@ impl Clone for LispType {
             LispType::Procedure(f) => LispType::Procedure(f.clone()),
             LispType::Cons(c) => LispType::Cons(c.clone()),
             LispType::Vector(v, l) => LispType::Vector(v.clone(), l.clone()),
+            LispType::Input(i) => LispType::Input(i.clone()),
+            LispType::Output(o) => LispType::Output(o.clone()),
         }
     }
 }
@@ -63,6 +70,8 @@ impl Display for LispType {
                     .collect::<Vec<String>>()
                     .join(" ")
             ),
+            LispType::Input(_) => write!(f, "<input>"),
+            LispType::Output(_) => write!(f, "<output>"),
         }
     }
 }
@@ -110,6 +119,14 @@ impl PartialEq for LispType {
                 LispType::Vector(m, n) => v == m && l == n,
                 _ => false,
             },
+            LispType::Input(i) => match other {
+                LispType::Input(m) => i.as_ref() as *const _ == m.as_ref() as *const _,
+                _ => false,
+            },
+            LispType::Output(o) => match other {
+                LispType::Output(m) => o.as_ref() as *const _ == m.as_ref() as *const _,
+                _ => false,
+            },
         }
     }
 }
@@ -117,5 +134,16 @@ impl LispType {
     pub fn cons_of(car: LispType, cdr: LispType) -> LispType {
         Cons_::new(car, cdr)
     }
+    pub fn vector_of(vec: Vec<LispType>) -> LispType {
+        let len = vec.len() as usize;
+        LispType::Vector(Rc::new(RefCell::new(vec)), len)
+    }
+    pub fn input_of(input: Box<dyn Read>) -> LispType {
+        LispType::Input(Rc::new(RefCell::new(input)))
+    }
+    pub fn output_of(output: Box<dyn Write>) -> LispType {
+        LispType::Output(Rc::new(RefCell::new(output)))
+    }
+
 }
 // pub use self::atom::*;
