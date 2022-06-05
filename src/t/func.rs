@@ -6,7 +6,7 @@ use crate::t::LispType::*;
 use std::cell::RefCell;
 use std::rc::Rc;
 
-pub struct ApplyArgs{
+pub struct ApplyArgs {
     expr: List,
     args: Option<List>,
     lazy_args: fn(List, RefEnv) -> List,
@@ -32,7 +32,19 @@ impl ApplyArgs {
     }
 
     pub fn clone_of(&mut self, args: Option<List>) -> ApplyArgs {
-        ApplyArgs::new(List::new(), args, |l, v| List::new(), self.inter, self.env.clone())
+        ApplyArgs::new(
+            List::new(),
+            args,
+            |l, v| List::new(),
+            self.inter,
+            self.env.clone(),
+        )
+    }
+
+    pub fn fork_env(&mut self) -> ApplyArgs {
+        let mut child = self.clone();
+        child.env = Env::extend(self.env.clone());
+        child
     }
 
     pub fn expr(&self) -> &List {
@@ -54,7 +66,7 @@ impl ApplyArgs {
         e(exp, self.env.clone())
     }
 
-    pub fn inter_4_env(&mut self, exp: &LispType, env:RefEnv) -> LispType {
+    pub fn inter_4_env(&mut self, exp: &LispType, env: RefEnv) -> LispType {
         let e = self.inter;
         e(exp, env)
     }
@@ -86,5 +98,17 @@ impl ApplyArgs {
         } else {
             panic!("apply: invalid argument");
         }
+    }
+}
+
+impl Clone for ApplyArgs {
+    fn clone(&self) -> Self {
+        ApplyArgs::new(
+            self.expr.clone(),
+            self.args.clone(),
+            self.lazy_args,
+            self.inter,
+            self.env.clone(),
+        )
     }
 }

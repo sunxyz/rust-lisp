@@ -63,7 +63,7 @@ fn cmd_handler() {
     let mut line = String::new();
     loop {
         line.clear();
-        print!("lisp> ");
+        print!("> ");
         std::io::stdout().flush();
         std::io::stdin().read_line(&mut line).unwrap();
         if(line.trim() == "exit") {
