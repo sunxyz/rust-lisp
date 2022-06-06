@@ -38,6 +38,14 @@ impl ProcedureRegister for Env {
     }
 }
 
+impl ApplyArgs {
+    fn check_args_num(&mut self, num: usize) {
+        if self.args().len() != num {
+            panic!("args num error");
+        }
+    }
+}
+
 pub fn init_procedure(env: &mut Env) {
     number::reg_procedure(env);
     boolean::reg_procedure(env);

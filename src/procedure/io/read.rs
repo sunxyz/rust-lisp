@@ -1,4 +1,5 @@
 use std::io::Read;
+use std::io::{BufRead, BufReader};
 
 use super::*;
 
@@ -9,9 +10,13 @@ fn read_char(apply_args: &mut ApplyArgs) -> LispType {
         std::io::stdin().read_exact(&mut v);
         LispType::Char(v[0] as char)
     } else if list.len() == 1 {
+        // let mut f = BufReader::new(File::open("input.txt").expect("open failed"));
         let port = list.car();
         if let Input(io) = port {
+            let t = io.to_owned();
             io.try_borrow_mut().expect("io error").read_exact(&mut v);
+        }else{
+            panic!("read-char: not a port");
         }
         LispType::Char(v[0] as char)
     } else {
@@ -31,24 +36,15 @@ fn read_line(apply_args: &mut ApplyArgs) -> LispType {
             // todo: read_line
             io.try_borrow_mut()
                 .expect("io error")
-                .read_to_string(&mut v);
+                .read_line(&mut v);
+        }else{
+            panic!("read-line: not a port");
         }
         LispType::Strings(v)
     } else {
         panic!("read-line: wrong number of arguments")
     }
 }
-
-// fn read_line(apply_args: &mut ApplyArgs) -> LispType {
-//     // let list = apply_args.args();
-//     // if list.len() == 0 {
-//     //     let mut str = String::new();
-//     //     std::io::stdin().read_line(&mut str);
-//     //     return Strings(str);
-//     // }
-//     // Nil
-
-// }
 
 fn read_string(apply_args: &mut ApplyArgs) -> LispType {
     let list = apply_args.args();
@@ -62,6 +58,8 @@ fn read_string(apply_args: &mut ApplyArgs) -> LispType {
             io.try_borrow_mut()
                 .expect("io error")
                 .read_to_string(&mut v);
+        }else{
+            panic!("read-string: not a port");
         }
         LispType::Strings(v)
     } else {
@@ -81,14 +79,13 @@ fn read_u8(apply_args: &mut ApplyArgs) -> LispType {
             let mut v = [0u8; 1];
             io.try_borrow_mut().expect("io error").read_exact(&mut v);
             LispType::Number(v[0] as i32)
-        } else {
-            panic!("read-u8: wrong number of arguments")
+        }else{
+            panic!("read-u8: not a port");
         }
     } else {
         panic!("read-u8: wrong number of arguments")
     }
 }
-
 
 fn read_byte_vector(apply_args: &mut ApplyArgs) -> LispType {
     let list = apply_args.args();
@@ -117,8 +114,8 @@ fn read_byte_vector(apply_args: &mut ApplyArgs) -> LispType {
                     .map(|x| Number(x.clone() as i32))
                     .collect::<Vec<LispType>>();
                 return LispType::vector_of(vec);
-            } else {
-                panic!("read-u8: wrong number of arguments")
+            } else{
+                panic!("read-byte-vector: not a port");
             }
         } else {
             panic!("read-byte-vector: wrong number of arguments")

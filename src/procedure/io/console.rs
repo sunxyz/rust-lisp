@@ -10,12 +10,6 @@ fn display(apply_args: &mut ApplyArgs) -> LispType {
     Nil
 }
 
-fn newline(apply_args: &mut ApplyArgs) -> LispType {
-    println!();
-    Nil
-}
-
 pub fn reg_procedure(env: &mut Env) {
     env.reg_procedure("display", display);
-    env.reg_procedure("newline", newline);
 }

@@ -7,7 +7,7 @@ use std::fmt::Display;
 use std::fmt::Formatter;
 use std::fmt::Result;
 use std::fs::File;
-use std::io::Read;
+use std::io::BufRead;
 use std::io::Write;
 use std::rc::Rc;
 
@@ -26,7 +26,7 @@ pub enum LispType {
     Procedure(Rc<Box<dyn Fn(&mut ApplyArgs) -> LispType>>),
     Cons(Cons_),
     Vector(Rc<RefCell<Vec<LispType>>>, usize),
-    Input(Rc<RefCell<Box<dyn Read>>>),
+    Input(Rc<RefCell<Box<dyn BufRead>>>),
     Output(Rc<RefCell<Box<dyn Write>>>),
 }
 
@@ -138,12 +138,11 @@ impl LispType {
         let len = vec.len() as usize;
         LispType::Vector(Rc::new(RefCell::new(vec)), len)
     }
-    pub fn input_of(input: Box<dyn Read>) -> LispType {
+    pub fn input_of(input: Box<dyn BufRead>) -> LispType {
         LispType::Input(Rc::new(RefCell::new(input)))
     }
     pub fn output_of(output: Box<dyn Write>) -> LispType {
         LispType::Output(Rc::new(RefCell::new(output)))
     }
-
 }
 // pub use self::atom::*;
