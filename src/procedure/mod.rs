@@ -22,6 +22,7 @@ mod type_;
 mod nil;
 mod lazy_evaluation;
 mod do_;
+mod time;
 
 use crate::env::{Env, EnvOps, RefEnv};
 use crate::t::LispType::*;
