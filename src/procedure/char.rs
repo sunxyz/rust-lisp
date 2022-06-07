@@ -29,7 +29,7 @@ fn char_eq(apply_args: &mut ApplyArgs) -> LispType {
     }
 }
 
-fn char2number(apply_args: &mut ApplyArgs) -> LispType {
+fn char2integer(apply_args: &mut ApplyArgs) -> LispType {
     let list = apply_args.args();
     if (list.len() != 1) {
         panic!("char->number: wrong number of arguments");
@@ -41,8 +41,55 @@ fn char2number(apply_args: &mut ApplyArgs) -> LispType {
         panic!("char->number: not a char");
     }
 }
+
+fn char_up_case(apply_args: &mut ApplyArgs) -> LispType {
+    let list = apply_args.args();
+    if (list.len() != 1) {
+        panic!("char-upcase: wrong number of arguments");
+    }
+    let arg = list.car();
+    if let Char(c) = arg {
+        Char(c.to_ascii_uppercase())
+    } else {
+        panic!("char-upcase: not a char");
+    }
+}
+
+fn char_down_case(apply_args: &mut ApplyArgs) -> LispType {
+    let list = apply_args.args();
+    if (list.len() != 1) {
+        panic!("char-downcase: wrong number of arguments");
+    }
+    let arg = list.car();
+    if let Char(c) = arg {
+        Char(c.to_ascii_lowercase())
+    } else {
+        panic!("char-downcase: not a char");
+    }
+}
+
+fn digit_value(apply_args: &mut ApplyArgs) -> LispType {
+    let list = apply_args.args();
+    if (list.len() != 1) {
+        panic!("digit-value: wrong number of arguments");
+    }
+    let arg = list.car();
+    if let Char(c) = arg {
+        if c.is_digit(10) {
+            Number(c as isize - '0' as isize)
+        } else {
+            panic!("digit-value: not a digit");
+        }
+    } else {
+        panic!("digit-value: not a char");
+    }
+}
+
 pub fn reg_procedure(env: &mut Env) {
     env.reg_procedure("char?", is_char);
     env.reg_procedure("char=?", char_eq);
-    env.reg_procedure("char->number", char2number);
+    env.reg_procedure("char->integer", char2integer);
+    env.reg_procedure("char-upcase", char_up_case);
+    env.reg_procedure("char-downcase", char_down_case);
+    env.reg_procedure("digit-value", digit_value);
 }
