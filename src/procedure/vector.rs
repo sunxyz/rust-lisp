@@ -55,7 +55,7 @@ fn vector_eq(apply_args: &mut ApplyArgs) -> LispType {
 fn vector_length(apply_args: &mut ApplyArgs) -> LispType {
     let list = apply_args.args();
     let size = list.len();
-    Number(size as i32)
+    Number(size as isize)
 }
 
 fn vector_ref(apply_args: &mut ApplyArgs) -> LispType {
@@ -67,7 +67,7 @@ fn vector_ref(apply_args: &mut ApplyArgs) -> LispType {
                 if i < 0 {
                     panic!("vector-ref: index out of range");
                 }
-                if i >= s as i32 {
+                if i >= s as isize {
                     panic!("vector-ref: index out of range");
                 }
                 l.borrow()[i as usize].clone()
@@ -91,7 +91,7 @@ fn vector_set(apply_args: &mut ApplyArgs) -> LispType {
                 if i < 0 {
                     panic!("vector-set!: index out of range");
                 }
-                if i >= s as i32 {
+                if i >= s as isize {
                     panic!("vector-set!: index out of range");
                 }
                 l.borrow_mut()[i as usize] = list.cdr().cdr().car();

@@ -36,7 +36,7 @@ fn char2number(apply_args: &mut ApplyArgs) -> LispType {
     }
     let arg = list.car();
     if let Char(c) = arg {
-        Number(c as i32)
+        Number(c as isize)
     } else {
         panic!("char->number: not a char");
     }

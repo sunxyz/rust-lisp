@@ -98,13 +98,13 @@ fn mod_(apply_args: &mut ApplyArgs) -> LispType {
     calc(apply_args, |a, b| a  % b)
 }
 
-fn calc(apply_args: &mut ApplyArgs, f: fn(i32, i32) -> i32) -> LispType {
+fn calc(apply_args: &mut ApplyArgs, f: fn(isize, isize) -> isize) -> LispType {
     Number(
         apply_args
             .args()
             .data()
             .iter()
-            .map(|x| -> i32 {
+            .map(|x| -> isize {
                 match x {
                     LispType::Number(i) => *i,
                     v => panic!("{} not a number", v),

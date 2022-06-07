@@ -36,7 +36,7 @@ fn list_length(apply_args: &mut ApplyArgs) -> LispType {
     }
     let arg = list.car();
     if let Expr(l) = arg {
-        Number(l.len() as i32)
+        Number(l.len() as isize)
     } else {
         panic!("list-length: not a list");
     }
@@ -54,7 +54,7 @@ fn list_ref(apply_args: &mut ApplyArgs) -> LispType {
             if i < 0 {
                 panic!("list-ref: index out of range");
             }
-            if i >= l.len() as i32 {
+            if i >= l.len() as isize {
                 panic!("list-ref: index out of range");
             }
             l.data()[i as usize].clone()
@@ -78,7 +78,7 @@ fn list_tail(apply_args: &mut ApplyArgs) -> LispType {
             if i < 0 {
                 panic!("list-tail: index out of range");
             }
-            if i >= l.len() as i32 {
+            if i >= l.len() as isize {
                 panic!("list-tail: index out of range");
             }
             Expr(List::of(l.data()[i as usize..].to_vec()))
@@ -102,7 +102,7 @@ fn list_set(apply_args: &mut ApplyArgs) -> LispType {
             if i < 0 {
                 panic!("list-set!: index out of range");
             }
-            if i >= l.len() as i32 {
+            if i >= l.len() as isize {
                 panic!("list-set!: index out of range");
             }
             l.data()[i as usize] = list.cdr().cdr().car().clone();

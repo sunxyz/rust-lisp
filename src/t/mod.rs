@@ -16,7 +16,7 @@ pub use self::func::ApplyArgs;
 pub use self::list::List;
 
 pub enum LispType {
-    Number(i32),
+    Number(isize),
     Symbol(String),
     Strings(String),
     Boolean(bool),

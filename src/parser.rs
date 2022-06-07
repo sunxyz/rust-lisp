@@ -78,7 +78,7 @@ fn rep_str(str: String) -> String {
         if let Some(j) = sub.find("'") {
             let s = &sub[..j].replace(" ", "\\u0009");
             let mut all_str = String::new();
-            let right_str = &str[..i+1];
+            let right_str = &str[..i + 1];
             let left_str = &sub[j..];
             all_str.push_str(right_str);
             all_str.push_str(s);
@@ -102,8 +102,8 @@ fn parse_atom(s: &str) -> Result<LispType, String> {
                 LispType::Strings(s[1..s.len() - 1].replace("\\u0009", " ").to_string())
             } else if s.starts_with("\\#") && s.len() > 2 {
                 LispType::Char(s.chars().nth(2).unwrap())
-            } else if s.parse::<i32>().is_ok() {
-                LispType::Number(s.parse::<i32>().unwrap())
+            } else if s.parse::<isize>().is_ok() {
+                LispType::Number(s.parse::<isize>().unwrap())
             } else {
                 LispType::Symbol(s.to_string())
             }
