@@ -70,8 +70,8 @@ impl Display for LispType {
                     .collect::<Vec<String>>()
                     .join(" ")
             ),
-            LispType::Input(_) => write!(f, "<input>"),
-            LispType::Output(_) => write!(f, "<output>"),
+            LispType::Input(_) => write!(f, "<port>"),
+            LispType::Output(_) => write!(f, "<port>"),
         }
     }
 }
