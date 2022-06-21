@@ -54,8 +54,11 @@ fn vector_eq(apply_args: &mut ApplyArgs) -> LispType {
 
 fn vector_length(apply_args: &mut ApplyArgs) -> LispType {
     let list = apply_args.args();
-    let size = list.len();
-    Number(size as isize)
+    if let Vector(v, s) = list.car() {
+        Number(s as isize)
+    }else {
+        Number(-1)
+    }
 }
 
 fn vector_ref(apply_args: &mut ApplyArgs) -> LispType {

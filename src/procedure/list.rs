@@ -329,7 +329,7 @@ pub fn reg_procedure(env: &mut Env) {
     env.reg_procedure("list-ref", list_ref);
     env.reg_procedure("list-tail", list_tail);
     env.reg_procedure("list-set!", list_set);
-    env.reg_procedure("list_length", list_length);
+    env.reg_procedure("list-length", list_length);
     env.reg_procedure("append", append);
     env.reg_procedure("reverse", reverse);
     env.reg_procedure("list->vector", list2vector);

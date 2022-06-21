@@ -32,7 +32,7 @@ fn symbol_eq(apply_args: &mut ApplyArgs) -> LispType {
 }
 
 fn symbol2string(apply_args: &mut ApplyArgs)->LispType{
-    let list = apply_args.args();
+    let list = apply_args.expr();
     if (list.len() != 1) {
         panic!("symbol->string: wrong number of arguments");
     }

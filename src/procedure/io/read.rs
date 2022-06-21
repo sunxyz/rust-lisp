@@ -108,8 +108,10 @@ fn read_byte_vector(apply_args: &mut ApplyArgs) -> LispType {
             if let Number(k) = list.cdr().car() {
                 let k = k as usize;
                 let mut v = vec![0u8; k];
-                io.try_borrow_mut().expect("io error").read_exact(&mut v);
-                let vec = v
+                let buf =  v.as_mut_slice();
+                // io.try_borrow_mut().expect("io error").read_exact(&mut v);
+                io.try_borrow_mut().expect("msg").read(buf);
+                let vec = buf
                     .iter()
                     .map(|x| Byte(x.clone()))
                     .collect::<Vec<LispType>>();
