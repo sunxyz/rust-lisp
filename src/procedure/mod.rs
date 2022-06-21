@@ -7,6 +7,7 @@ mod cons;
 mod set;
 mod vector;
 mod list;
+mod byte;
 mod quote;
 mod apply;
 mod define_macro;
@@ -51,6 +52,7 @@ pub fn init_procedure(env: &mut Env) {
     number::reg_procedure(env);
     boolean::reg_procedure(env);
     char::reg_procedure(env);
+    byte::reg_procedure(env);
     symbol::reg_procedure(env);
     string::reg_procedure(env);
     cons::reg_procedure(env);

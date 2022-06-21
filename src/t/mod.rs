@@ -19,8 +19,9 @@ pub enum LispType {
     Number(isize),
     Symbol(String),
     Strings(String),
-    Boolean(bool),
     Char(char),
+    Byte(u8),
+    Boolean(bool),
     Nil,
     Expr(List),
     Procedure(Rc<Box<dyn Fn(&mut ApplyArgs) -> LispType>>),
@@ -38,6 +39,7 @@ impl Clone for LispType {
             LispType::Strings(s) => LispType::Strings(s.clone()),
             LispType::Boolean(b) => LispType::Boolean(*b),
             LispType::Char(c) => LispType::Char(*c),
+            LispType::Byte(u)=> LispType::Byte(*u),    
             LispType::Nil => LispType::Nil,
             LispType::Expr(l) => LispType::Expr(l.clone()),
             LispType::Procedure(f) => LispType::Procedure(f.clone()),
@@ -57,6 +59,7 @@ impl Display for LispType {
             LispType::Strings(s) => write!(f, "{}", s),
             LispType::Boolean(b) => write!(f, "{}", if *b { "#t" } else { "#f" }),
             LispType::Char(c) => write!(f, "{}", c),
+            LispType::Byte(u) => write!(f, "{}", u),
             LispType::Nil => write!(f, "nil"),
             LispType::Expr(l) => write!(f, "{}", l),
             LispType::Procedure(_) => write!(f, "<procedure>"),
@@ -97,6 +100,10 @@ impl PartialEq for LispType {
             },
             LispType::Char(c) => match other {
                 LispType::Char(m) => c == m,
+                _ => false,
+            },
+            LispType::Byte(u) => match other {
+                LispType::Byte(m) => u == m,
                 _ => false,
             },
             LispType::Nil => match other {

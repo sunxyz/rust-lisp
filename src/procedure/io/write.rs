@@ -140,13 +140,13 @@ fn write_u8(apply_args: &mut ApplyArgs) -> LispType {
         panic!("write-u8: wrong number of arguments");
     } else {
         let w = list.car();
-        if let Number(n) = w {
+        if let Byte(n) = w {
             if list.len() == 1 {
-                std::io::stdout().write_all(&[n as u8]);
+                std::io::stdout().write_all(&[n]);
             } else if list.len() == 2 {
                 let port = list.cdr().car();
                 if let Output(io) = port {
-                    io.try_borrow_mut().expect("io error").write_all(&[n as u8]);
+                    io.try_borrow_mut().expect("io error").write_all(&[n]);
                 } else {
                     panic!("write-u8: not a port");
                 }

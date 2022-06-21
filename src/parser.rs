@@ -99,7 +99,7 @@ fn parse_atom(s: &str) -> Result<LispType, String> {
         "#f" => LispType::Boolean(false),
         _ => {
             if s.starts_with("'") && s.ends_with("'") && s.len() > 2 {
-                LispType::Strings(s[1..s.len() - 1].replace("\\u0009", " ").to_string())
+                LispType::Strings(s[1..s.len() - 1].replace("\\u0009", " ").replace("\\r", "\r").replace("\\n", "\n").to_string())
             } else if s.starts_with("\\#") && s.len() > 2 {
                 LispType::Char(s.chars().nth(2).unwrap())
             } else if s.parse::<isize>().is_ok() {

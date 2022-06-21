@@ -78,7 +78,7 @@ fn read_u8(apply_args: &mut ApplyArgs) -> LispType {
         if let Input(io) = port {
             let mut v = [0u8; 1];
             io.try_borrow_mut().expect("io error").read_exact(&mut v);
-            LispType::Number(v[0] as isize)
+            LispType::Byte(v[0] as u8)
         }else{
             panic!("read-u8: not a port");
         }
@@ -96,22 +96,22 @@ fn read_byte_vector(apply_args: &mut ApplyArgs) -> LispType {
             std::io::stdin().read_exact(&mut v);
             let vec = v
                 .iter()
-                .map(|x| Number(x.clone() as isize))
+                .map(|x| Byte(x.clone()))
                 .collect::<Vec<LispType>>();
             return LispType::vector_of(vec);
         } else {
             panic!("read-byte-vector: wrong number of arguments")
         }
-    } else if list.len() == 1 {
+    } else if list.len() == 2 {
         let port = list.car();
         if let Input(io) = port {
-            if let Number(k) = list.car() {
+            if let Number(k) = list.cdr().car() {
                 let k = k as usize;
                 let mut v = vec![0u8; k];
                 io.try_borrow_mut().expect("io error").read_exact(&mut v);
                 let vec = v
                     .iter()
-                    .map(|x| Number(x.clone() as isize))
+                    .map(|x| Byte(x.clone()))
                     .collect::<Vec<LispType>>();
                 return LispType::vector_of(vec);
             } else{
