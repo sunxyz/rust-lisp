@@ -138,6 +138,9 @@ impl PartialEq for LispType {
     }
 }
 impl LispType {
+    pub fn expr_of(elem_s: Vec<LispType>) -> LispType {
+        LispType::Expr(List::of(elem_s))
+    }
     pub fn cons_of(car: LispType, cdr: LispType) -> LispType {
         Cons_::new(car, cdr)
     }

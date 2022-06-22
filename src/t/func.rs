@@ -33,7 +33,7 @@ impl ApplyArgs {
 
     pub fn clone_of(&mut self, args: Option<List>) -> ApplyArgs {
         ApplyArgs::new(
-            List::new(),
+            if let Some (l) = args.clone() {l} else {List::new()},
             args,
             |l, v| List::new(),
             self.inter,

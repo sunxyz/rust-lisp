@@ -47,34 +47,54 @@ fn render(apply_args: &mut ApplyArgs) -> LispType {
     }
 }
 
-fn render0(exp: &List, apply_args: &mut ApplyArgs) -> List {
+fn render0(expr: &List, apply_args: &mut ApplyArgs) -> List {
     let mut list = List::new();
-    for elem in exp.data() {
-        // println!("elem:{}", elem);
-        if let Symbol(k) = elem {
-            if let Some(0) = k.find(",@") {
-                // println!("render: ,@");
-                let name = k.clone().replace(",@", "");
-                let v = apply_args.inter(&Symbol(name));
-                if let Expr(l) = v {
-                    list.push_all(l);
-                } else {
-                    list.push(v);
+    let data = expr.data();
+    let mut pre = Nil;
+    let render_single_symbol = Symbol(",".to_string());
+    let render_flat_symbol = Symbol(",@".to_string());
+    for elem in data {
+        // println!("pre : {} elem: {}", pre, elem);
+        if render_single_symbol.eq(&pre) {
+            reader_single(&mut list, &elem, apply_args);
+        } else if render_flat_symbol.eq(&pre) {
+            reader_flat(&mut list, &elem, apply_args);
+        } else if !(render_single_symbol.eq(&elem) || render_flat_symbol.eq(&elem)) {
+            if let Expr(exp) = elem.clone() {
+                if(exp.is_nil()){
+                    list.push(Expr(exp));
+                }else{
+                    let r = render0(&exp, apply_args);
+                    let car = exp.car();
+                    if render_single_symbol.eq(&car) {
+                        list.push_all(r);
+                    } else if render_flat_symbol.eq(&car){
+                        list.push_all(r);
+                    }else{
+                        list.push(Expr(r));
+                    }
                 }
-            } else if let Some(0) = k.find(",") {
-                let name = k.clone().replace(",", "");
-                let v = apply_args.inter(&Symbol(name));
-                list.push(v);
             } else {
-                list.push(Symbol(k.clone()));
+                list.push(elem.clone())
             }
-        } else if let Expr(l) = elem {
-            list.push(Expr(render0(&l, apply_args)));
-        } else {
-            list.push(elem);
         }
+        pre = elem;
     }
     list
+}
+
+fn reader_flat(exps: &mut List, exp: &LispType, apply_args: &mut ApplyArgs) {
+    let r = apply_args.inter(exp);
+    if let Expr(el) = r {
+        exps.push_all(el)
+    } else {
+        exps.push(r)
+    }
+}
+
+fn reader_single(exps: &mut List, exp: &LispType, apply_args: &mut ApplyArgs) {
+    let r = apply_args.inter(exp);
+    exps.push(r)
 }
 
 pub fn reg_procedure(env: &mut Env) {

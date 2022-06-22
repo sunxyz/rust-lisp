@@ -1,3 +1,5 @@
+use std::ops::Index;
+
 use super::t::*;
 
 static PREFIX: &'static str = "(";
@@ -105,7 +107,21 @@ fn parse_atom(s: &str) -> Result<LispType, String> {
             } else if s.parse::<isize>().is_ok() {
                 LispType::Number(s.parse::<isize>().unwrap())
             } else {
-                LispType::Symbol(s.to_string())
+                if let Some(i) =  s.find(",@"){
+                    if i ==0 && s.len()>2{
+                        LispType::expr_of(vec![LispType::Symbol(",@".to_string()),LispType::Symbol(s.replace(",@",""))])
+                    }else {
+                        LispType::Symbol(s.to_string())
+                    }
+                }else if let Some(i) =  s.find(","){
+                    if i ==0 && s.len()>1 {
+                        LispType::expr_of(vec![LispType::Symbol(",".to_string()),LispType::Symbol(s.replace(",",""))])
+                    }else {
+                        LispType::Symbol(s.to_string())
+                    }
+                }else{
+                    LispType::Symbol(s.to_string())
+                }
             }
         }
     };
