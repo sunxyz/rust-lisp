@@ -26,7 +26,7 @@
 * [x] load support ; #
 * [x] eval
 * [x] lazy evaluation (delay promise? force)
-* [ ] io (file io | socket(net) io | console io)
+* [x] io (file io | socket(net) io | console io)
 * [ ] concurrency (async await | thread )
 * [ ] more can be implemented through macros 
 
