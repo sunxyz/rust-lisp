@@ -137,6 +137,24 @@ fn append(apply_args: &mut ApplyArgs) -> LispType {
     Nil
 }
 
+fn add(apply_args: &mut ApplyArgs) -> LispType {
+    let list = apply_args.args();
+    if (list.len() < 1) {
+        panic!("append: wrong number of arguments");
+    }
+    let result = list.car().clone();
+    let args = list.cdr();
+    if let Expr(r) = result {
+        let mut r = r.clone();
+        args.data().iter().for_each(|arg| {
+            r.push(arg.clone());
+        });
+    } else {
+        panic!("append: not a list");
+    }
+    Nil
+}
+
 fn reverse(apply_args: &mut ApplyArgs) -> LispType {
     let list = apply_args.args();
     if (list.len() != 1) {
@@ -330,6 +348,7 @@ pub fn reg_procedure(env: &mut Env) {
     env.reg_procedure("list-tail", list_tail);
     env.reg_procedure("list-set!", list_set);
     env.reg_procedure("list-length", list_length);
+    env.reg_procedure("list-add", add);
     env.reg_procedure("append", append);
     env.reg_procedure("reverse", reverse);
     env.reg_procedure("list->vector", list2vector);
