@@ -27,9 +27,9 @@ use std::{
 };
 use t::LispType::{self,Nil};
 
-// fn main() {
-//     args_handler();
-// }
+fn main() {
+    args_handler();
+}
 
 fn args_handler(){
     let args: Vec<String> = std_env::args().collect();
@@ -78,30 +78,5 @@ fn cmd_handler() {
             println!("{}", r);
         }
     }
-}
-
-use futures::{executor::block_on, FutureExt, future::BoxFuture};
-use futures::future::Future;
-use futures::future::IntoFuture;
- fn main() {
-    let v = t();
-
-   
-    // let v2:Box<dyn Future<Output = LispType>> =  Box::new(j());
-    let v2 = j();
-     let d = block_on(v);
-   block_on(v2);
-    // IntoFuture::into_future(v2).await;
-    println!("{}", d);
-}
-
-async fn  t () -> LispType{
-    println!("hello");
-    LispType::Strings("()".to_string())
-}
-
- fn  j () -> BoxFuture<'static, LispType> {
-    println!("word");
-    Box::pin(async { Nil})
 }
 
