@@ -79,6 +79,26 @@ fn var_update(vars: List, apply_args: &mut ApplyArgs) {
     }
 }
 
+fn while_fn(apply_args: &mut ApplyArgs) -> LispType {
+    let list = apply_args.expr();
+    let len = list.len();
+    if (len < 2) {
+        panic!("while: too few arguments");
+    }
+    let test_exp = list.car();
+    let body = Expr(list.cdr());
+    let apply_args = &mut apply_args.fork_env();
+    loop {
+        let test = apply_args.inter(&test_exp);
+        if is_true(&test) {
+             apply_args.inter(&body);
+        }else{
+           return apply_args.inter(&body);
+        }
+    }
+}
+
 pub fn reg_procedure(env: &mut Env) {
     env.reg_procedure("do", do_);
+    env.reg_procedure("while", while_fn);
 }
