@@ -36,7 +36,7 @@ trait ProcedureRegister {
 
 impl ProcedureRegister for Env {
     fn reg_procedure(&mut self, name: &str, proc: fn(&mut ApplyArgs) -> LispType) {
-        self.define(name, Procedure(Rc::new(Box::new(proc))));
+        self.define(name, LispType::procedure_of(Box::new(proc)));
     }
 }
 

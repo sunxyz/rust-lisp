@@ -8,10 +8,10 @@ fn delay(apply_args: &mut ApplyArgs) -> LispType {
     LispType::cons_of(
         LispType::cons_of(
             Symbol("promise".to_string()),
-            Procedure(Rc::new(Box::new(move |x| {
+            LispType::procedure_of(Box::new(move |x| {
                 // println!("promise: {}", "called");
                 x.inter_4_env(&Expr(expr.clone()), env.clone())
-            }))),
+            })),
         ),
         LispType::cons_of(Boolean(false), Nil),
     )

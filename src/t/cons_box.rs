@@ -1,15 +1,15 @@
 use super::*;
-pub struct Cons_ {
+pub struct ConsBox {
     car: Rc<RefCell<LispType>>,
     cdr: Rc<RefCell<LispType>>,
 }
 
-impl Cons_ {
-    pub fn new(car: LispType, cdr: LispType) -> LispType {
-        LispType::Cons(Cons_ {
+impl ConsBox {
+    pub fn new(car: LispType, cdr: LispType) -> Self {
+        ConsBox {
             car: Rc::new(RefCell::new(car)),
             cdr: Rc::new(RefCell::new(cdr)),
-        })
+        }
     }
     pub fn car(&self) -> LispType {
         self.car.borrow().clone()
@@ -25,23 +25,23 @@ impl Cons_ {
     }
 }
 
-impl Clone for Cons_ {
+impl Clone for ConsBox {
     fn clone(&self) -> Self {
-        Cons_ {
+        ConsBox {
             car: self.car.clone(),
             cdr: self.cdr.clone(),
         }
     }
 }
 
-impl Display for Cons_ {
+impl Display for ConsBox {
     fn fmt(&self, f: &mut Formatter) -> Result {
         write!(f, "({} {})", self.car.borrow(), self.cdr.borrow())
     }
 }
 
-impl PartialEq for Cons_ {
-    fn eq(&self, other: &Cons_) -> bool {
+impl PartialEq for ConsBox {
+    fn eq(&self, other: &ConsBox) -> bool {
         self.car.borrow().eq(&other.car.borrow()) && self.cdr.borrow().eq(&other.cdr.borrow())
     }
 }

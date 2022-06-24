@@ -176,7 +176,7 @@ fn list2vector(apply_args: &mut ApplyArgs) -> LispType {
     }
     let arg = list.car();
     if let Expr(l) = arg {
-        Vector(Rc::new(RefCell::new(l.data())), l.len())
+       LispType::vector_of(l.data())
     } else {
         panic!("list->vector: not a list");
     }

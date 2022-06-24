@@ -30,7 +30,7 @@ fn call_with_tcp_listener(apply_args: &mut ApplyArgs) -> LispType {
 fn handle_connection(
     mut stream: TcpStream,
     apply_args: &mut ApplyArgs,
-    proc: &Rc<Box<dyn Fn(&mut ApplyArgs) -> LispType>>,
+    proc: &ProcedureBox,
 ) {
     // let mut buffer = [0; 1024];
     // stream.read(&mut buffer).unwrap();

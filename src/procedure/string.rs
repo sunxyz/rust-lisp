@@ -318,8 +318,7 @@ fn string2vector(apply_args: &mut ApplyArgs) -> LispType {
         for c in s.chars() {
             result.push(Char(c));
         }
-        let size = result.len();
-        Vector(Rc::new(RefCell::new(result)), size)
+        LispType::vector_of(result)
     } else {
         panic!("string->vector: not a string");
     }

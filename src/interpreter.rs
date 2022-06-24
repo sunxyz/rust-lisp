@@ -5,7 +5,7 @@ use crate::{
     t::{
         ApplyArgs,
         LispType::{self, *},
-        List,
+        List, ProcedureBox,
     },
 };
 use std::cell::RefCell;
@@ -71,7 +71,7 @@ pub fn interpreter(exp: List, env: RefEnv) -> LispType {
 }
 
 fn apply(
-    f: Rc<Box<dyn Fn(&mut ApplyArgs) -> LispType>>, //Func,//fn(&mut ApplyArgs) -> LispType,
+    f: ProcedureBox, //Func,//fn(&mut ApplyArgs) -> LispType,
     cdr: List,
     env: RefEnv,
     args: Option<List>,

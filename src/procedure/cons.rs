@@ -35,7 +35,7 @@ fn cons(apply_args: &mut ApplyArgs) -> LispType {
     if list.len() == 2 {
         let car = list.car();
         let cdr = list.cdr().car();
-        Cons_::new(car, cdr)
+        LispType::cons_of(car, cdr)
     } else {
         panic!("cons: wrong number of arguments");
     }

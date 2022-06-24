@@ -24,14 +24,13 @@ fn make_vector(apply_args: &mut ApplyArgs) -> LispType {
     } else {
         panic!("make_vector: wrong number of arguments");
     }
-    Vector(Rc::new(RefCell::new(vec)), size as usize)
+   LispType::vector_of(vec)
 }
 
 fn vector(apply_args: &mut ApplyArgs) -> LispType {
     let list = apply_args.args();
     let vec = list.data().clone();
-    let size = vec.len();
-    Vector(Rc::new(RefCell::new(vec)), size)
+    LispType::vector_of(vec)
 }
 
 fn is_vector(apply_args: &mut ApplyArgs) -> LispType {

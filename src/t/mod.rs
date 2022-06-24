@@ -1,4 +1,4 @@
-mod cons_;
+mod cons_box;
 mod func;
 mod list;
 
@@ -11,9 +11,13 @@ use std::io::BufRead;
 use std::io::Write;
 use std::rc::Rc;
 
-pub use self::cons_::Cons_;
 pub use self::func::ApplyArgs;
+pub use self::cons_box::ConsBox;
 pub use self::list::List;
+pub type ProcedureBox = Rc<Box<dyn Fn(&mut ApplyArgs) -> LispType>>;
+pub type VectorBox = Rc<RefCell<Vec<LispType>>>;
+pub type InputBox =  Rc<RefCell<Box<dyn BufRead>>>;
+pub type OutputBox = Rc<RefCell<Box<dyn Write>>>;
 
 pub enum LispType {
     Number(isize),
@@ -23,12 +27,12 @@ pub enum LispType {
     Byte(u8),
     Boolean(bool),
     Nil,
+    Cons(ConsBox),
     Expr(List),
-    Procedure(Rc<Box<dyn Fn(&mut ApplyArgs) -> LispType>>),
-    Cons(Cons_),
-    Vector(Rc<RefCell<Vec<LispType>>>, usize),
-    Input(Rc<RefCell<Box<dyn BufRead>>>),
-    Output(Rc<RefCell<Box<dyn Write>>>),
+    Procedure(ProcedureBox),
+    Vector(VectorBox, usize),
+    Input(InputBox),
+    Output(OutputBox),
 }
 
 impl Clone for LispType {
@@ -138,15 +142,18 @@ impl PartialEq for LispType {
     }
 }
 impl LispType {
+    pub fn cons_of(car: LispType, cdr: LispType) -> LispType {
+        LispType::Cons(ConsBox::new(car, cdr))
+    }
     pub fn expr_of(elem_s: Vec<LispType>) -> LispType {
         LispType::Expr(List::of(elem_s))
-    }
-    pub fn cons_of(car: LispType, cdr: LispType) -> LispType {
-        Cons_::new(car, cdr)
     }
     pub fn vector_of(vec: Vec<LispType>) -> LispType {
         let len = vec.len() as usize;
         LispType::Vector(Rc::new(RefCell::new(vec)), len)
+    }
+    pub fn procedure_of(f: Box<dyn Fn(&mut ApplyArgs) -> LispType>) -> LispType {
+        LispType::Procedure(Rc::new(f))
     }
     pub fn input_of(input: Box<dyn BufRead>) -> LispType {
         LispType::Input(Rc::new(RefCell::new(input)))
