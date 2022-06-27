@@ -1,5 +1,3 @@
-use tokio::sync::Mutex;
-
 // Cons list vector dict set
 use super::LispType;
 use std::cell::RefCell;
@@ -29,6 +27,8 @@ impl List {
     pub fn car(&self) -> LispType {
         self.0.try_read().expect("locked car")[0].clone()
     }
+
+    
 
     pub fn cdr(&self) -> List {
         let t = self.0.try_read().expect("locked list")[1..].to_vec();
@@ -73,6 +73,10 @@ impl List {
 
     pub fn data(&self) -> Vec<LispType> {
         self.0.try_read().expect("locked list").clone()
+    }
+
+    pub fn pop(&self) -> LispType {
+        self.0.try_write().expect("locked get").pop().expect("locked get")
     }
 
 }

@@ -23,7 +23,7 @@ use interpreter::{eval, interpreter};
 use parser::parser;
 use std::{
     env as std_env,
-    io::{self, Read, Write}, rc::Rc, borrow::Borrow, thread, sync::{Mutex, Arc},
+    io::{self, Read, Write}, rc::Rc, borrow::{Borrow, BorrowMut}, thread, sync::{Mutex, Arc},
 };
 use t::{LispType::{self,Nil}, ApplyArgs};
 
@@ -107,16 +107,3 @@ fn cmd_handler() {
 //     // inter: fn(&LispType, RefEnv) -> LispType,
 //     // env: RefEnv,
 // }
-
-fn t (a:ApplyArgs){
-    let f= |x: ApplyArgs|{
-        LispType::Nil
-    };
-    let hdl = thread::spawn(move ||{
-        f(a);
-        // 获取锁
-        // lock2.lock().unwrap().push_str(" thread ");
-        // 释放锁
-        // 不用主动释放的原因是，Rust 会记住 lock() 时的作用域，离开作用域会自动释放
-    });
-}

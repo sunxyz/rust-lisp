@@ -1,6 +1,7 @@
 mod cons_box;
 mod func;
 mod list;
+mod concurrency;
 
 use std::cell::RefCell;
 use std::fmt::Display;
@@ -12,14 +13,17 @@ use std::io::Write;
 use std::pin::Pin;
 use std::rc::Rc;
 use std::sync::Arc;
+use std::sync::Barrier;
 use std::sync::Mutex;
 use std::sync::RwLock;
+use std::thread;
 
 
 
 pub use self::func::ApplyArgs;
 pub use self::cons_box::ConsBox;
 pub use self::list::List;
+pub use self::concurrency::ConcurrencyBox;
 pub type ProcedureBox = Arc<RwLock<Box<dyn Fn(&mut ApplyArgs) -> LispType + Send + Sync>>>;
 pub type VectorBox = Arc<RwLock<Vec<LispType>>>;
 pub type InputBox =  Arc<Mutex<Box<dyn BufRead + Send>>>;
@@ -39,6 +43,7 @@ pub enum LispType {
     Vector(VectorBox, usize),
     Input(InputBox),
     Output(OutputBox),
+    Concurrency(ConcurrencyBox),
 }
 
 impl Clone for LispType {
@@ -57,6 +62,7 @@ impl Clone for LispType {
             LispType::Vector(v, l) => LispType::Vector(v.clone(), l.clone()),
             LispType::Input(i) => LispType::Input(i.clone()),
             LispType::Output(o) => LispType::Output(o.clone()),
+            LispType::Concurrency(c) => LispType::Concurrency(c.clone()),
         }
     }
 }
@@ -85,6 +91,7 @@ impl Display for LispType {
             ),
             LispType::Input(_) => write!(f, "<port>"),
             LispType::Output(_) => write!(f, "<port>"),
+            LispType::Concurrency(c) => write!(f, "{}", c),
         }
     }
 }
@@ -144,6 +151,10 @@ impl PartialEq for LispType {
                 LispType::Output(m) => o.as_ref() as *const _ == m.as_ref() as *const _,
                 _ => false,
             },
+            LispType::Concurrency(c) => match other {
+                LispType::Concurrency(m) => m.eq(c),
+                _ => false,
+            },
         }
     }
 }
@@ -166,6 +177,15 @@ impl LispType {
     }
     pub fn output_of(output: Box<dyn Write + Send>) -> LispType {
         LispType::Output(Arc::new(Mutex::new(output)))
+    }
+    pub fn concurrency_thread_of(join_handler: thread::JoinHandle<LispType>) -> LispType {
+        LispType::Concurrency(ConcurrencyBox::THREAD( Arc::new(join_handler)))
+    }
+    pub fn concurrency_lock_of(lock: LispType) -> LispType {
+        LispType::Concurrency(ConcurrencyBox::LOCK(Arc::new(Mutex::new(lock))))
+    }
+    pub fn concurrency_barrier_of(size: usize) -> LispType {
+        LispType::Concurrency(ConcurrencyBox::BARRIER(Arc::new(RwLock::new(Barrier::new(size)))))
     }
 }
 // pub use self::atom::*;
