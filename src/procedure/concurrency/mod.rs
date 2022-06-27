@@ -1,9 +1,9 @@
+use super::LispType;
+use super::*;
 use std::{
     sync::{Barrier, Mutex},
     thread,
 };
-use super::LispType;
-use super::*;
 
 fn thread_run(apply_args: &mut ApplyArgs) -> LispType {
     let proc = apply_args.args().car();
@@ -12,16 +12,12 @@ fn thread_run(apply_args: &mut ApplyArgs) -> LispType {
         let mut apply_args0 = apply_args.clone_of(Some(args));
         let join_handler = thread::Builder::new()
             .name("thread".into())
-            .spawn(move || {
-                proc.read().expect("proc error")(&mut apply_args0)
-            });
+            .spawn(move || proc.read().expect("proc error")(&mut apply_args0));
         LispType::concurrency_thread_of(join_handler.expect("thread error"))
     } else {
         panic!("thread-run: not a procedure");
     }
 }
-
-
 
 fn thread_join(apply_args: &mut ApplyArgs) -> LispType {
     let thread = apply_args.args().pop();
@@ -71,6 +67,51 @@ fn sleep(apply_args: &mut ApplyArgs) -> LispType {
     }
 }
 
+fn make_channel(apply_args: &mut ApplyArgs) -> LispType {
+    LispType::make_concurrency_channel()
+}
+
+fn channel_send(apply_args: &mut ApplyArgs) -> LispType {
+    apply_args.check_args_num(2);
+    let car = apply_args.args().car();
+    let cdr = apply_args.args().cdr();
+    if let Concurrency(ConcurrencyBox::Channel(tx, rx)) = car {
+        tx.send(cdr.car()).expect("channel send error");
+        Nil
+    } else {
+        panic!("channel-send: not a channel");
+    }
+}
+
+fn channel_recv(apply_args: &mut ApplyArgs) -> LispType {
+    apply_args.check_args_num(1);
+    let car = apply_args.args().car();
+    if let Concurrency(ConcurrencyBox::Channel(tx, rx)) = car {
+        rx.recv().expect("channel recv error")
+    } else {
+        panic!("channel-recv: not a channel");
+    }
+}
+
+fn channel_foreach(apply_args: &mut ApplyArgs) -> LispType {
+    apply_args.check_args_num(2);
+    let car = apply_args.args().car();
+    let cdr = apply_args.args().cdr().car();
+    if let Concurrency(ConcurrencyBox::Channel(tx, rx)) = car {
+        if let Procedure(proc)=cdr{
+            rx.iter().for_each(|x| {
+                let mut apply_args0 = apply_args.clone_of(Some(List::of(vec![x])));
+                proc.read().expect("proc error")(&mut apply_args0);
+            });
+            Nil
+        }else {
+            panic!("channel-for-each: not a procedure");
+        }
+    } else {
+        panic!("channel-for-each: not a channel");
+    }
+}
+
 pub fn reg_procedure(env: &mut Env) {
     env.reg_procedure("thread-run", thread_run);
     env.reg_procedure("sleep", sleep);
@@ -78,4 +119,8 @@ pub fn reg_procedure(env: &mut Env) {
     env.reg_procedure("make-lock", make_lock);
     env.reg_procedure("make-barrier", make_barrier);
     env.reg_procedure("barrier-await", barrier_await);
+    env.reg_procedure("make-channel", make_channel);
+    env.reg_procedure("channel-send", channel_send);
+    env.reg_procedure("channel-recv", channel_recv);
+    env.reg_procedure("channel-for-each", channel_foreach);
 }

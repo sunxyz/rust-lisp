@@ -187,5 +187,9 @@ impl LispType {
     pub fn concurrency_barrier_of(size: usize) -> LispType {
         LispType::Concurrency(ConcurrencyBox::BARRIER(Arc::new(RwLock::new(Barrier::new(size)))))
     }
+    pub fn make_concurrency_channel() -> LispType {
+        let (tx, tr) = flume::unbounded();
+        LispType::Concurrency(ConcurrencyBox::Channel(tx, tr))
+    }
 }
 // pub use self::atom::*;

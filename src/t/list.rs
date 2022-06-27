@@ -75,10 +75,6 @@ impl List {
         self.0.try_read().expect("locked list").clone()
     }
 
-    pub fn pop(&self) -> LispType {
-        self.0.try_write().expect("locked get").pop().expect("locked get")
-    }
-
 }
 
 impl Copy for ListType {}
