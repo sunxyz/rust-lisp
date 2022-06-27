@@ -5,6 +5,7 @@
 ## Implemented procedure (method)
 * [x] number procedure (+ - * / < <= > >= = number? number=? number->string number->char)
 * [x] boolean operation (and or not)
+* [x] byte byte-vector->string
 * [x] char procedure (char? char=? char->number)
 * [x] symbol procedure (symbol? symbol=? symbol->string)
 * [x] string procedure (string? string=? mark-string string-length string-ref string-set! substring string-append string-copy string-find string-trim string-replace string->list ...)
