@@ -20,13 +20,14 @@ fn thread_run(apply_args: &mut ApplyArgs) -> LispType {
 }
 
 fn thread_join(apply_args: &mut ApplyArgs) -> LispType {
-    let thread = apply_args.args().pop();
-    if let Concurrency(ConcurrencyBox::THREAD(t)) = thread {
-        // t.join().expect("thread join error")
-        Nil
-    } else {
-        panic!("thread-join: not a thread");
-    }
+    // // let thread = apply_args.args().pop();
+    // if let Concurrency(ConcurrencyBox::THREAD(t)) = thread {
+    //     // t.join().expect("thread join error")
+    //     Nil
+    // } else {
+    //     panic!("thread-join: not a thread");
+    // }
+    Nil
 }
 
 fn make_lock(apply_args: &mut ApplyArgs) -> LispType {
