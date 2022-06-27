@@ -13,11 +13,6 @@ use std::pin::Pin;
 use std::rc::Rc;
 use std::sync::Arc;
 
-use futures::Future;
-use futures::channel::mpsc::Receiver;
-use futures::channel::mpsc::Sender;
-use futures::channel::mpsc::channel;
-use futures::lock::Mutex;
 
 pub use self::func::ApplyArgs;
 pub use self::cons_box::ConsBox;
@@ -26,7 +21,6 @@ pub type ProcedureBox = Rc<Box<dyn Fn(&mut ApplyArgs) -> LispType>>;
 pub type VectorBox = Rc<RefCell<Vec<LispType>>>;
 pub type InputBox =  Rc<RefCell<Box<dyn BufRead>>>;
 pub type OutputBox = Rc<RefCell<Box<dyn Write>>>;
-pub type ChannelBox= Arc<RefCell<(Sender<LispType>, Receiver<LispType>)>>;
 
 pub enum LispType {
     Number(isize),
@@ -42,7 +36,6 @@ pub enum LispType {
     Vector(VectorBox, usize),
     Input(InputBox),
     Output(OutputBox),
-    Channel(ChannelBox),
 }
 
 impl Clone for LispType {
@@ -61,7 +54,6 @@ impl Clone for LispType {
             LispType::Vector(v, l) => LispType::Vector(v.clone(), l.clone()),
             LispType::Input(i) => LispType::Input(i.clone()),
             LispType::Output(o) => LispType::Output(o.clone()),
-            LispType::Channel(c) => LispType::Channel(c.clone()),
         }
     }
 }
@@ -90,7 +82,6 @@ impl Display for LispType {
             ),
             LispType::Input(_) => write!(f, "<port>"),
             LispType::Output(_) => write!(f, "<port>"),
-            LispType::Channel(_) => write!(f, "<channel>"),
         }
     }
 }
@@ -150,10 +141,6 @@ impl PartialEq for LispType {
                 LispType::Output(m) => o.as_ref() as *const _ == m.as_ref() as *const _,
                 _ => false,
             },
-            LispType::Channel(c) => match other {
-                LispType::Channel(m) => c.as_ref() as *const _ == m.as_ref() as *const _,
-                _ => false,
-            },
         }
     }
 }
@@ -176,9 +163,6 @@ impl LispType {
     }
     pub fn output_of(output: Box<dyn Write>) -> LispType {
         LispType::Output(Rc::new(RefCell::new(output)))
-    }
-    pub fn make_channel(buffer: usize) -> LispType {
-        LispType::Channel(Arc::new(RefCell::new(channel::<LispType>(buffer))))
     }
 }
 // pub use self::atom::*;
