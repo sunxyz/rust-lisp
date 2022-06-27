@@ -23,9 +23,10 @@ use interpreter::{eval, interpreter};
 use parser::parser;
 use std::{
     env as std_env,
-    io::{self, Read, Write}, rc::Rc, borrow::Borrow,
+    io::{self, Read, Write}, rc::Rc, borrow::Borrow, thread, sync::{Mutex, Arc},
 };
-use t::LispType::{self,Nil};
+use t::{LispType::{self,Nil}, ApplyArgs};
+
 
 fn main() {
     args_handler();
@@ -57,7 +58,7 @@ fn args_handler(){
 fn cmd_handler() {
 
     let root = Env::root();
-    procedure::init_procedure(&mut root.borrow_mut());
+    procedure::init_procedure(&mut root.try_write().expect("locked error"));
     let env = Env::extend(root);
     println!("\n\x1b[34m--------------------------\n welcome rust-lisp v0.1.0 \n--------------------------\x1b[0m \n \x1b[30msource code:https://github.com/sunxyz/rust-lisp \x1b[0m\n");
     let mut line = String::new();
@@ -79,4 +80,43 @@ fn cmd_handler() {
         }
     }
 }
+// use std::{sync::{Arc, Mutex}, thread, pin::Pin};
 
+
+// pub type ProcedureBox = Mutex<Box<dyn Fn (&mut ApplyArgs0) -> LispType0 + Send>>;
+
+// pub struct List0(Arc<Mutex<Vec<LispType0>>>);
+
+// pub enum LispType0 {
+//     Number(isize),
+//     Symbol(String),
+//     Strings(String),
+//     Char(char),
+//     Byte(u8),
+//     Boolean(bool),
+//     Nil,
+//     Expr(List0),
+//     Procedure(ProcedureBox),
+// }
+
+
+// pub struct ApplyArgs0 {
+//     expr:List0,
+//     // args: Option<t::List>,
+//     // lazy_args: fn(t::List, RefEnv) -> t::List,
+//     // inter: fn(&LispType, RefEnv) -> LispType,
+//     // env: RefEnv,
+// }
+
+fn t (a:ApplyArgs){
+    let f= |x: ApplyArgs|{
+        LispType::Nil
+    };
+    let hdl = thread::spawn(move ||{
+        f(a);
+        // 获取锁
+        // lock2.lock().unwrap().push_str(" thread ");
+        // 释放锁
+        // 不用主动释放的原因是，Rust 会记住 lock() 时的作用域，离开作用域会自动释放
+    });
+}

@@ -1,3 +1,5 @@
+use tokio::sync::Mutex;
+
 // Cons list vector dict set
 use super::LispType;
 use std::cell::RefCell;
@@ -5,34 +7,36 @@ use std::fmt::Display;
 use std::fmt::Formatter;
 use std::fmt::Result;
 use std::rc::Rc;
+use std::sync::Arc;
+use std::sync::RwLock;
 
 enum ListType {
     SUB,
     EXPR,
 }
 
-pub struct List(Rc<RefCell<Vec<LispType>>>, ListType);
+pub struct List(Arc<RwLock<Vec<LispType>>>, ListType);
 
 impl List {
     pub fn new() -> Self {
-        List(Rc::new(RefCell::new(Vec::new())), ListType::EXPR)
+        List(Arc::new(RwLock::new(Vec::new())), ListType::EXPR)
     }
 
     pub fn of(elem_s: Vec<LispType>) -> Self {
-        List(Rc::new(RefCell::new(elem_s)), ListType::EXPR)
+        List(Arc::new(RwLock::new(elem_s)), ListType::EXPR)
     }
 
     pub fn car(&self) -> LispType {
-        self.0.borrow()[0].clone()
+        self.0.try_read().expect("locked car")[0].clone()
     }
 
     pub fn cdr(&self) -> List {
-        let t = self.0.borrow()[1..].to_vec();
-        List(Rc::new(RefCell::new(t)), ListType::SUB)
+        let t = self.0.try_read().expect("locked list")[1..].to_vec();
+        List(Arc::new(RwLock::new(t)), ListType::SUB)
     }
 
     pub fn is_nil(&self) -> bool {
-        self.0.borrow().len() == 0
+        self.0.try_read().expect("locked list").len() == 0
     }
 
     pub fn is_expr(&self) -> bool {
@@ -52,23 +56,23 @@ impl List {
     }
 
     pub fn push(&mut self, elem: LispType) {
-        self.0.borrow_mut().push(elem);
+        self.0.try_write().expect("locked list").push(elem);
     }
 
     pub fn push_vec(&mut self, elem: Vec<LispType>) {
-        self.0.borrow_mut().extend(elem);
+        self.0.try_write().expect("locked list").extend(elem);
     }
 
     pub fn push_all(&mut self, elem: List) {
-        self.0.borrow_mut().extend(elem.data());
+        self.0.try_write().expect("locked list").extend(elem.data());
     }
 
     pub fn len(&self) -> usize {
-        self.0.borrow().len()
+        self.0.try_read().expect("locked list").len()
     }
 
     pub fn data(&self) -> Vec<LispType> {
-        self.0.borrow().clone()
+        self.0.try_read().expect("locked list").clone()
     }
 
 }
@@ -89,7 +93,7 @@ impl Display for List {
             f,
             "({})",
             self.0
-                .borrow()
+                .try_read().expect("locked list")
                 .iter()
                 .map(|x| x.to_string())
                 .collect::<Vec<String>>()
@@ -106,11 +110,11 @@ impl Clone for List {
 
 impl PartialEq for List {
     fn eq(&self, other: &Self) -> bool {
-        if self.0.borrow().len() != other.0.borrow().len() {
+        if self.0.try_read().expect("locked list").len() != other.0.try_read().expect("locked list").len() {
             return false;
         }
-        for i in 0..self.0.borrow().len() {
-            if self.0.borrow()[i] != other.0.borrow()[i] {
+        for i in 0..self.0.try_read().expect("locked list").len() {
+            if self.0.try_read().expect("locked list")[i] != other.0.try_read().expect("locked list")[i] {
                 return false;
             }
         }

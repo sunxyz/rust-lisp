@@ -14,7 +14,7 @@ fn read_char(apply_args: &mut ApplyArgs) -> LispType {
         let port = list.car();
         if let Input(io) = port {
             let t = io.to_owned();
-            io.try_borrow_mut().expect("io error").read_exact(&mut v);
+            io.try_lock().expect("io error").read_exact(&mut v);
         }else{
             panic!("read-char: not a port");
         }
@@ -34,7 +34,7 @@ fn read_line(apply_args: &mut ApplyArgs) -> LispType {
         let port = list.car();
         if let Input(io) = port {
             // todo: read_line
-            io.try_borrow_mut()
+            io.try_lock()
                 .expect("io error")
                 .read_line(&mut v);
         }else{
@@ -55,7 +55,7 @@ fn read_string(apply_args: &mut ApplyArgs) -> LispType {
     } else if list.len() == 1 {
         let port = list.car();
         if let Input(io) = port {
-            io.try_borrow_mut()
+            io.try_lock()
                 .expect("io error")
                 .read_to_string(&mut v);
         }else{
@@ -77,7 +77,7 @@ fn read_u8(apply_args: &mut ApplyArgs) -> LispType {
         let port = list.car();
         if let Input(io) = port {
             let mut v = [0u8; 1];
-            io.try_borrow_mut().expect("io error").read_exact(&mut v);
+            io.try_lock().expect("io error").read_exact(&mut v);
             LispType::Byte(v[0] as u8)
         }else{
             panic!("read-u8: not a port");
@@ -109,8 +109,8 @@ fn read_byte_vector(apply_args: &mut ApplyArgs) -> LispType {
                 let k = k as usize;
                 let mut v = vec![0u8; k];
                 let buf =  v.as_mut_slice();
-                // io.try_borrow_mut().expect("io error").read_exact(&mut v);
-                io.try_borrow_mut().expect("msg").read(buf);
+                // io.try_lock().expect("locked err").expect("io error").read_exact(&mut v);
+                io.try_lock().expect("locked err").read(buf);
                 let vec = buf
                     .iter()
                     .map(|x| Byte(x.clone()))

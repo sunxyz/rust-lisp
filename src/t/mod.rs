@@ -12,15 +12,18 @@ use std::io::Write;
 use std::pin::Pin;
 use std::rc::Rc;
 use std::sync::Arc;
+use std::sync::Mutex;
+use std::sync::RwLock;
+
 
 
 pub use self::func::ApplyArgs;
 pub use self::cons_box::ConsBox;
 pub use self::list::List;
-pub type ProcedureBox = Rc<Box<dyn Fn(&mut ApplyArgs) -> LispType>>;
-pub type VectorBox = Rc<RefCell<Vec<LispType>>>;
-pub type InputBox =  Rc<RefCell<Box<dyn BufRead>>>;
-pub type OutputBox = Rc<RefCell<Box<dyn Write>>>;
+pub type ProcedureBox = Arc<RwLock<Box<dyn Fn(&mut ApplyArgs) -> LispType + Send + Sync>>>;
+pub type VectorBox = Arc<RwLock<Vec<LispType>>>;
+pub type InputBox =  Arc<Mutex<Box<dyn BufRead + Send>>>;
+pub type OutputBox = Arc<Mutex<Box<dyn Write + Send>>>;
 
 pub enum LispType {
     Number(isize),
@@ -74,7 +77,7 @@ impl Display for LispType {
             LispType::Vector(v, _) => write!(
                 f,
                 "#({})",
-                v.borrow()
+                v.try_read().expect("vector lock error")
                     .iter()
                     .map(|x| x.to_string())
                     .collect::<Vec<String>>()
@@ -130,7 +133,7 @@ impl PartialEq for LispType {
                 _ => false,
             },
             LispType::Vector(v, l) => match other {
-                LispType::Vector(m, n) => v == m && l == n,
+                LispType::Vector(m, n) => v.as_ref() as *const _ == m.as_ref() as *const _&& l == n,
                 _ => false,
             },
             LispType::Input(i) => match other {
@@ -153,16 +156,16 @@ impl LispType {
     }
     pub fn vector_of(vec: Vec<LispType>) -> LispType {
         let len = vec.len() as usize;
-        LispType::Vector(Rc::new(RefCell::new(vec)), len)
+        LispType::Vector(Arc::new(RwLock::new(vec)), len)
     }
-    pub fn procedure_of(f: Box<dyn Fn(&mut ApplyArgs) -> LispType>) -> LispType {
-        LispType::Procedure(Rc::new(f))
+    pub fn procedure_of(f: Box<dyn Fn(&mut ApplyArgs) -> LispType + Send + Sync>) -> LispType {
+        LispType::Procedure(Arc::new(RwLock::new(f)))
     }
-    pub fn input_of(input: Box<dyn BufRead>) -> LispType {
-        LispType::Input(Rc::new(RefCell::new(input)))
+    pub fn input_of(input: Box<dyn BufRead + Send>) -> LispType {
+        LispType::Input(Arc::new(Mutex::new(input)))
     }
-    pub fn output_of(output: Box<dyn Write>) -> LispType {
-        LispType::Output(Rc::new(RefCell::new(output)))
+    pub fn output_of(output: Box<dyn Write + Send>) -> LispType {
+        LispType::Output(Arc::new(Mutex::new(output)))
     }
 }
 // pub use self::atom::*;

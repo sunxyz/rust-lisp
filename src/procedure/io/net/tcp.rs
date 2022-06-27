@@ -38,7 +38,7 @@ fn handle_connection(
     let input = LispType::input_of(Box::new(read));
     // stream
     let args = Some(List::of(vec![input]));
-    let res = proc(&mut apply_args.clone_of(args));
+    let res = proc.try_read().expect("locked err")(&mut apply_args.clone_of(args));
 
     let response = res.to_string();
     stream.write(response.as_bytes()).unwrap();

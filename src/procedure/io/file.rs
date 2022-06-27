@@ -14,7 +14,7 @@ fn call_with_input_file(apply_args: &mut ApplyArgs) -> LispType {
             let mut args = List::new();
             args.push(read);
             let mut a = apply_args.clone_of(Some(args));
-            proc(&mut a)
+            proc.try_read().expect("locked err")(&mut a)
         } else {
             panic!("Invalid procedure");
         }
@@ -34,7 +34,7 @@ fn call_with_output_file(apply_args: &mut ApplyArgs) -> LispType {
             let mut args = List::new();
             args.push(write);
             let mut a = apply_args.clone_of(Some(args));
-            proc(&mut a)
+            proc.try_read().expect("locked err")(&mut a)
         } else {
             panic!("Invalid procedure");
         }

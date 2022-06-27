@@ -46,7 +46,7 @@ fn var_bind(vars: List, apply_args: &mut ApplyArgs) {
             let val = exp.cdr().car();
             if let Symbol(var0) = var {
                 let val = apply_args.inter(&val);
-                apply_args.env().borrow_mut().define(var0.as_str(), val);
+                apply_args.env().try_write().expect("locked err").define(var0.as_str(), val);
             } else {
                 panic!("do: variable must be symbol");
             }
@@ -68,8 +68,8 @@ fn var_update(vars: List, apply_args: &mut ApplyArgs) {
             // let val = exp.cdr().car();
             if let Symbol(var0) = var {
                 let val = apply_args.inter(&Expr(update_exp));
-                apply_args.env().borrow_mut().set(var0.as_str(), val);
-                // println! ("{}:{}",var0,apply_args.env().borrow_mut().get(var0.as_str()).unwrap());
+                apply_args.env().try_write().expect("locked err").set(var0.as_str(), val);
+                // println! ("{}:{}",var0,apply_args.env().try_lock().expect("locked err").get(var0.as_str()).unwrap());
             } else {
                 panic!("do: variable must be symbol");
             }

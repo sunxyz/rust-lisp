@@ -94,7 +94,7 @@ impl ApplyArgs {
                     panic!("apply: invalid last argument");
                 }
             }
-            f(self)
+            f.try_read().expect("locked err")(self)
         } else {
             panic!("apply: invalid argument");
         }

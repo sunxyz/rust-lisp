@@ -14,7 +14,7 @@ fn write_char(apply_args: &mut ApplyArgs) -> LispType {
             } else if list.len() == 2 {
                 let port = list.cdr().car();
                 if let Output(io) = port {
-                    io.try_borrow_mut()
+                    io.try_lock()
                         .expect("io error")
                         .write_all(c.to_string().as_bytes());
                 } else {
@@ -61,7 +61,7 @@ fn write_string(apply_args: &mut ApplyArgs) -> LispType {
                 let  str = &s[start..end];
               
                 if let Output(io) = port {
-                    io.try_borrow_mut()
+                    io.try_lock()
                         .expect("io error")
                         .write_all(str.as_bytes());
                 } else {
@@ -86,7 +86,7 @@ fn write_byte_vector(apply_args: &mut ApplyArgs) -> LispType {
         let w = list.get(0).expect("write-bytevector: wrong number of arguments");
         if let Vector(vec, _) = w {
             let bytes = vec
-                .borrow_mut()
+                .try_read().expect("write-bytevector: not a bytevector")
                 .iter()
                 .map(|x| {
                     if let Number(n) = x {
@@ -118,7 +118,7 @@ fn write_byte_vector(apply_args: &mut ApplyArgs) -> LispType {
                 }
                 let  bytes = &bytes[start..end];
                 if let Output(io) = port {
-                    io.try_borrow_mut()
+                    io.try_lock()
                         .expect("io error")
                         .write_all(bytes);
                 } else {
@@ -146,7 +146,7 @@ fn write_u8(apply_args: &mut ApplyArgs) -> LispType {
             } else if list.len() == 2 {
                 let port = list.cdr().car();
                 if let Output(io) = port {
-                    io.try_borrow_mut().expect("io error").write_all(&[n]);
+                    io.try_lock().expect("io error").write_all(&[n]);
                 } else {
                     panic!("write-u8: not a port");
                 }
@@ -166,7 +166,7 @@ fn newline(apply_args: &mut ApplyArgs) -> LispType {
         println!();
     } else if list.len() == 1 {
         if let Output(w) = list.car() {
-            w.try_borrow_mut().expect("io err").write_all(b"\n").unwrap();
+            w.try_lock().expect("io err").write_all(b"\n").unwrap();
         } else {
             panic!("newline: argument must be output stream");
         }

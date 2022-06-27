@@ -24,6 +24,7 @@ mod nil;
 mod lazy_evaluation;
 mod do_;
 mod time;
+mod concurrency;
 
 use crate::env::{Env, EnvOps, RefEnv};
 use crate::t::LispType::*;
@@ -76,4 +77,5 @@ pub fn init_procedure(env: &mut Env) {
     lazy_evaluation::reg_procedure(env);
     do_::reg_procedure(env);
     time::reg_procedure(env);
+    concurrency::reg_procedure(env);
 }

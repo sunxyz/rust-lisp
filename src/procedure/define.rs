@@ -5,7 +5,7 @@ fn define(apply_args: &mut ApplyArgs) -> LispType {
     let var_name = if let Symbol(_) = car {car} else{ apply_args.clone().inter(& car)};
     if let Symbol(key) = var_name{
         let v = apply_args.clone().inter(&Expr(expr.cdr()));
-        apply_args.env().borrow_mut().define(key.as_str(), v);
+        apply_args.env().try_write().expect("locked err").define(key.as_str(), v);
         Nil
     } else {
         panic!("define: invalid argument");

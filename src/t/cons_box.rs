@@ -1,27 +1,27 @@
 use super::*;
 pub struct ConsBox {
-    car: Rc<RefCell<LispType>>,
-    cdr: Rc<RefCell<LispType>>,
+    car: Arc<Mutex<LispType>>,
+    cdr: Arc<Mutex<LispType>>,
 }
 
 impl ConsBox {
     pub fn new(car: LispType, cdr: LispType) -> Self {
         ConsBox {
-            car: Rc::new(RefCell::new(car)),
-            cdr: Rc::new(RefCell::new(cdr)),
+            car: Arc::new(Mutex::new(car)),
+            cdr: Arc::new(Mutex::new(cdr)),
         }
     }
     pub fn car(&self) -> LispType {
-        self.car.borrow().clone()
+        self.car.try_lock().expect("locked err").clone()
     }
     pub fn cdr(&self) -> LispType {
-        self.cdr.borrow().clone()
+        self.cdr.try_lock().expect("locked err").clone()
     }
     pub fn set_car(&self, car: LispType) {
-        *self.car.borrow_mut() = car;
+        *self.car.try_lock().expect("locked err") = car;
     }
     pub fn set_cdr(&self, cdr: LispType) {
-        *self.cdr.borrow_mut() = cdr;
+        *self.cdr.try_lock().expect("locked err") = cdr;
     }
 }
 
@@ -36,12 +36,12 @@ impl Clone for ConsBox {
 
 impl Display for ConsBox {
     fn fmt(&self, f: &mut Formatter) -> Result {
-        write!(f, "({} {})", self.car.borrow(), self.cdr.borrow())
+        write!(f, "({} {})", self.car.try_lock().expect("locked err"), self.cdr.try_lock().expect("locked err"))
     }
 }
 
 impl PartialEq for ConsBox {
     fn eq(&self, other: &ConsBox) -> bool {
-        self.car.borrow().eq(&other.car.borrow()) && self.cdr.borrow().eq(&other.cdr.borrow())
+        self.car.try_lock().expect("locked err").eq(&other.car.try_lock().expect("locked err")) && self.cdr.try_lock().expect("locked err").eq(&other.cdr.try_lock().expect("locked err"))
     }
 }
