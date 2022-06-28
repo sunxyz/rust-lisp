@@ -179,7 +179,7 @@ fn newline(apply_args: &mut ApplyArgs) -> LispType {
 pub fn reg_procedure(env: &mut Env) {
     env.reg_procedure("write-char", write_char);
     env.reg_procedure("write-string", write_string);
-    env.reg_procedure("write-bytevector", write_byte_vector);
+    env.reg_procedure("write-byte-vector", write_byte_vector);
     env.reg_procedure("write-u8", write_u8);
     env.reg_procedure("newline", newline);
 }

@@ -23,7 +23,7 @@ use interpreter::{eval, interpreter};
 use parser::parser;
 use std::{
     env as std_env,
-    io::{self, Read, Write}, rc::Rc, borrow::{Borrow, BorrowMut}, thread, sync::{Mutex, Arc},
+    io::{self, Read, Write},
 };
 use t::{LispType::{self,Nil}, ApplyArgs};
 
@@ -80,30 +80,3 @@ fn cmd_handler() {
         }
     }
 }
-// use std::{sync::{Arc, Mutex}, thread, pin::Pin};
-
-
-// pub type ProcedureBox = Mutex<Box<dyn Fn (&mut ApplyArgs0) -> LispType0 + Send>>;
-
-// pub struct List0(Arc<Mutex<Vec<LispType0>>>);
-
-// pub enum LispType0 {
-//     Number(isize),
-//     Symbol(String),
-//     Strings(String),
-//     Char(char),
-//     Byte(u8),
-//     Boolean(bool),
-//     Nil,
-//     Expr(List0),
-//     Procedure(ProcedureBox),
-// }
-
-
-// pub struct ApplyArgs0 {
-//     expr:List0,
-//     // args: Option<t::List>,
-//     // lazy_args: fn(t::List, RefEnv) -> t::List,
-//     // inter: fn(&LispType, RefEnv) -> LispType,
-//     // env: RefEnv,
-// }
