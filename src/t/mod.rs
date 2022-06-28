@@ -3,15 +3,11 @@ mod func;
 mod list;
 mod concurrency;
 
-use std::cell::RefCell;
 use std::fmt::Display;
 use std::fmt::Formatter;
 use std::fmt::Result;
-use std::fs::File;
 use std::io::BufRead;
 use std::io::Write;
-use std::pin::Pin;
-use std::rc::Rc;
 use std::sync::Arc;
 use std::sync::Barrier;
 use std::sync::Mutex;
