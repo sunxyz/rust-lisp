@@ -7,6 +7,7 @@ mod cons;
 mod set;
 mod vector;
 mod list;
+mod dict;
 mod byte;
 mod quote;
 mod apply;
@@ -25,6 +26,7 @@ mod lazy_evaluation;
 mod do_;
 mod time;
 mod concurrency;
+
 
 use crate::env::{Env, EnvOps, RefEnv};
 use crate::t::LispType::*;
@@ -78,4 +80,5 @@ pub fn init_procedure(env: &mut Env) {
     do_::reg_procedure(env);
     time::reg_procedure(env);
     concurrency::reg_procedure(env);
+    dict::reg_procedure(env);
 }

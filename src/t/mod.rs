@@ -3,6 +3,7 @@ mod func;
 mod list;
 mod concurrency;
 
+use std::collections::HashMap;
 use std::fmt::Display;
 use std::fmt::Formatter;
 use std::fmt::Result;
@@ -24,6 +25,7 @@ pub type ProcedureBox = Arc<RwLock<Box<dyn Fn(&mut ApplyArgs) -> LispType + Send
 pub type VectorBox = Arc<RwLock<Vec<LispType>>>;
 pub type InputBox =  Arc<Mutex<Box<dyn BufRead + Send>>>;
 pub type OutputBox = Arc<Mutex<Box<dyn Write + Send>>>;
+pub type DictBox = Arc<RwLock<HashMap<String, LispType>>>;
 
 pub enum LispType {
     Number(isize),
@@ -37,6 +39,7 @@ pub enum LispType {
     Expr(List),
     Procedure(ProcedureBox),
     Vector(VectorBox, usize),
+    Dict(DictBox),
     Input(InputBox),
     Output(OutputBox),
     Concurrency(ConcurrencyBox),
@@ -59,6 +62,7 @@ impl Clone for LispType {
             LispType::Input(i) => LispType::Input(i.clone()),
             LispType::Output(o) => LispType::Output(o.clone()),
             LispType::Concurrency(c) => LispType::Concurrency(c.clone()),
+            LispType::Dict(d) => LispType::Dict(d.clone()),
         }
     }
 }
@@ -85,6 +89,7 @@ impl Display for LispType {
                     .collect::<Vec<String>>()
                     .join(" ")
             ),
+            LispType::Dict(i) => write!(f, "<dict>"),
             LispType::Input(_) => write!(f, "<port>"),
             LispType::Output(_) => write!(f, "<port>"),
             LispType::Concurrency(c) => write!(f, "{}", c),
@@ -139,6 +144,10 @@ impl PartialEq for LispType {
                 LispType::Vector(m, n) => v.as_ref() as *const _ == m.as_ref() as *const _&& l == n,
                 _ => false,
             },
+            LispType::Dict(d) => match other {
+                LispType::Dict(m) => d.as_ref() as *const _ == m.as_ref() as *const _,
+                _ => false,
+            },
             LispType::Input(i) => match other {
                 LispType::Input(m) => i.as_ref() as *const _ == m.as_ref() as *const _,
                 _ => false,
@@ -167,6 +176,9 @@ impl LispType {
     }
     pub fn procedure_of(f: Box<dyn Fn(&mut ApplyArgs) -> LispType + Send + Sync>) -> LispType {
         LispType::Procedure(Arc::new(RwLock::new(f)))
+    }
+    pub fn dict_of(dict: HashMap<String, LispType>) -> LispType {
+        LispType::Dict(Arc::new(RwLock::new(dict)))
     }
     pub fn input_of(input: Box<dyn BufRead + Send>) -> LispType {
         LispType::Input(Arc::new(Mutex::new(input)))
