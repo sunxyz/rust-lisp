@@ -175,7 +175,7 @@ impl LispType {
         LispType::Output(Arc::new(Mutex::new(output)))
     }
     pub fn concurrency_thread_of(join_handler: thread::JoinHandle<LispType>) -> LispType {
-        LispType::Concurrency(ConcurrencyBox::THREAD( Arc::new(join_handler)))
+        LispType::Concurrency(ConcurrencyBox::THREAD( Arc::new(Mutex::new(Some(join_handler)))))
     }
     pub fn concurrency_lock_of(lock: LispType) -> LispType {
         LispType::Concurrency(ConcurrencyBox::LOCK(Arc::new(Mutex::new(lock))))

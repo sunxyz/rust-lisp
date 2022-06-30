@@ -44,7 +44,7 @@ impl EnvOps for Env {
                 if let Some(v) = env.get(key) {
                     Some(v.clone())
                 } else {
-                    parent.try_read().expect("locked error").get(key)
+                    parent.read().expect("locked error").get(key)
                 }
             }
         }
@@ -57,7 +57,7 @@ impl EnvOps for Env {
                 if(env.contains_key(key)){
                     env.insert(key.to_string(), value);
                 } else{
-                    parent.try_write().expect("locked error").set(key, value);
+                    parent.write().expect("locked error").set(key, value);
                 }
             }
         }

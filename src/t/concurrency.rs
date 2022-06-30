@@ -9,7 +9,7 @@ use super::LispType;
 
 
 pub enum ConcurrencyBox {
-    THREAD(Arc<thread::JoinHandle<LispType>>),
+    THREAD(Arc<Mutex<Option<thread::JoinHandle<LispType>>>>),
     LOCK(Arc<Mutex<LispType>>),
     BARRIER(Arc<RwLock<Barrier>>),
     Channel(flume::Sender<LispType>, flume::Receiver<LispType>),
@@ -59,3 +59,19 @@ impl  PartialEq for ConcurrencyBox {
         }
     }
 }
+
+// pub struct WarpBox<T>{
+//     warp: Option<T>,
+// }
+
+// impl<T> WarpBox<T> {
+//     fn new(t : T) -> Self{
+//         WarpBox{
+//             warp: Some(t),
+//         }
+//     }
+//     fn unwrap(&mut self) -> T{
+//        self.warp.take().unwrap()
+//     }
+       
+// }
