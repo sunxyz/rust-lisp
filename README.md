@@ -12,6 +12,7 @@
 * [x] cons procedure (cons car cdr set-car! set-cdr!)
 * [x] list procedure (list list? list=? list-ref list-tail list-set! list_length append reverse list->vector list->string map for-each filter reduce)
 * [x] vector procedure (vector? vector=? make-vector vector vector-length vector-ref vector-set! vector-fill! vector->list)
+* [x] dict procedure (dict? dict=?  make-dict dict dict-length dict-get dict-rm! dict-put! dict-clear！ dict-contains-key? dict-keys->list dict-value->list dict->list)
 * [x] quote '
 * [x] procedure? method?
 * [x] nil? 
