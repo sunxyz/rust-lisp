@@ -12,10 +12,10 @@ pub trait RefOps<T>: Clone {
 
 impl<T> RefOps<T> for IRef<T> {
     fn ref4read(&self) -> RefRead<'_, T> {
-        self.read().expect("get_read: poisoned")
+        self.read().expect("ref4read: error")
     }
     fn ref4write(&self) -> RefWrite<'_, T> {
-        self.write().expect("get_write: poisoned")
+        self.write().expect("ref4write: error")
     }
     fn into_inner(self) -> T {
         self.into_inner()
