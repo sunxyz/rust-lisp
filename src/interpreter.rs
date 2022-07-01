@@ -1,18 +1,13 @@
 use crate::{
-    env::Env,
-    env::EnvOps,
-    env::RefEnv,
+    env::{Env, EnvOps, RefEnv},
+    parser::parser,
+    procedure::init_procedure,
     types::{
         ApplyArgs,
         LispType::{self, *},
-        List, ProcedureBox,
-        RefOps
+        List, ProcedureBox, RefOps,
     },
 };
-
-// use super::t::*;
-use super::parser::parser;
-use super::procedure::init_procedure;
 
 pub fn eval(exp: &str) -> Result<LispType, &str> {
     let root = Env::root();
