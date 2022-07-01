@@ -93,7 +93,7 @@ impl Display for LispType {
                     .collect::<Vec<String>>()
                     .join(" ")
             ),
-            LispType::Dict(i) => write!(f, "<dict>"),
+            LispType::Dict(i) => write!(f, "({})", i.ref4read().iter().map(|(k, v)| format!("({} {})", k, v)).collect::<Vec<String>>().join(" ")),
             LispType::Input(_) => write!(f, "<port>"),
             LispType::Output(_) => write!(f, "<port>"),
             LispType::Concurrency(c) => write!(f, "{}", c),
