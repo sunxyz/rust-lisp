@@ -52,7 +52,7 @@ fn channel_foreach(apply_args: &mut ApplyArgs) -> LispType {
                     return Nil;
                 }
                 let mut apply_args0 = apply_args.clone_of(Some(List::of(vec![x])));
-                proc.read().expect("proc error")(&mut apply_args0);
+                proc.read()(&mut apply_args0);
             }
             Nil
         }else {
@@ -76,7 +76,7 @@ fn channel_map(apply_args: &mut ApplyArgs) -> LispType {
                     return Expr(result);
                 }
                 let mut apply_args0 = apply_args.clone_of(Some(List::of(vec![x])));
-                result.push(proc.read().expect("proc error")(&mut apply_args0));
+                result.push(proc.read()(&mut apply_args0));
             }
             Expr(result)
         }else {

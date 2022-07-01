@@ -23,7 +23,7 @@ fn define_macro(apply_args: &mut ApplyArgs) -> LispType {
                 // println!("define-macro template:=> {}", template);
                 x.inter(&template)
             }));
-            apply_args.env().try_write().expect("locked err").define(&var, proc);
+            apply_args.env().write().define(&var, proc);
         } else {
             panic!("define-macro: invalid proc");
         }

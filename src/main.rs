@@ -27,6 +27,8 @@ use std::{
 };
 use t::{LispType::{self,Nil}, ApplyArgs};
 
+use crate::t::RefOps;
+
 
 fn main() {
     args_handler();
@@ -58,8 +60,8 @@ fn args_handler(){
 fn cmd_handler() {
 
     let root = Env::root();
-    procedure::init_procedure(&mut root.try_write().expect("locked error"));
-    let env = Env::extend(root);
+    procedure::init_procedure( &mut root.write());
+    let env = Env::extend( root);
     println!("\n\x1b[34m--------------------------\n welcome rust-lisp v0.1.0 \n--------------------------\x1b[0m \n \x1b[30msource code:https://github.com/sunxyz/rust-lisp \x1b[0m\n");
     let mut line = String::new();
     loop {

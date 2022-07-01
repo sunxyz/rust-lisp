@@ -1,10 +1,7 @@
-use crate::t::LispType;
-use std::cell::RefCell;
+use crate::t::{LispType, IRef, RefOps, ref_};
 use std::collections::HashMap;
-use std::rc::Rc;
-use std::sync::{Arc, RwLock};
 
-pub type RefEnv = Arc<RwLock<Env>>;
+pub type RefEnv = IRef<Env>;
 
 pub enum Env {
     Empty,
@@ -44,7 +41,7 @@ impl EnvOps for Env {
                 if let Some(v) = env.get(key) {
                     Some(v.clone())
                 } else {
-                    parent.read().expect("locked error").get(key)
+                    parent.read().get(key)
                 }
             }
         }
@@ -57,7 +54,7 @@ impl EnvOps for Env {
                 if(env.contains_key(key)){
                     env.insert(key.to_string(), value);
                 } else{
-                    parent.write().expect("locked error").set(key, value);
+                    parent.write().set(key, value);
                 }
             }
         }
@@ -78,5 +75,5 @@ impl EnvOps for Env {
 }
 
 fn ref_env_of(env: Env) -> RefEnv {
-    Arc::new(RwLock::new(env))
+    ref_::new(env)
 }

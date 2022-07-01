@@ -8,16 +8,16 @@ use crate::{
         List, ProcedureBox,
     },
 };
-use std::cell::RefCell;
-use std::rc::Rc;
 
 // use super::t::*;
 use super::parser::parser;
 use super::procedure::init_procedure;
+use super::t::RefOps;
 
 pub fn eval(exp: &str) -> Result<LispType, &str> {
     let root = Env::root();
-    init_procedure(&mut root.try_write().expect("locked error"));
+    // let v = root.write();
+    init_procedure(&mut root.borrow_mut());
     let env = Env::extend(root);
     let exp = parser(exp.to_string()).expect("parser error");
     Ok(interpreter(exp, env))
@@ -31,7 +31,7 @@ pub fn interpreter(exp: List, env: RefEnv) -> LispType {
     match car {
         Symbol(key) => {
             let v = env
-                .try_read().expect("locked error")
+                .read()
                 .get(key.as_str())
                 .expect(format!("undefined symbol: {}", key).as_str());
             if let Procedure(f) = v.clone() {
@@ -84,7 +84,7 @@ fn apply(
         t
     };
 
-    f.try_read().expect("locked err")(&mut ApplyArgs::new(
+    f.read()(&mut ApplyArgs::new(
         cdr,
         None,
         lazy_args_f,
@@ -97,7 +97,7 @@ fn interpreter0(o: &LispType, env: RefEnv) -> LispType {
     match o {
         Expr(l) => interpreter(l.clone(), env),
         Symbol(s) => env
-            .try_read().expect("locked error")
+            .read()
             .get(s.as_str())
             .expect(format!("undefined symbol {}", s.as_str()).as_str()),
         _ => o.clone(),
