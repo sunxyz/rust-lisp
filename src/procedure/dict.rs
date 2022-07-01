@@ -67,7 +67,7 @@ fn dict_rm(apply_args: &mut ApplyArgs) -> LispType {
     if args.len()==2{
         if let Dict( dict) = args.car(){
             let key = args.cdr().car();
-            dict.write().remove(&key.to_string());
+            dict.ref4write().remove(&key.to_string());
             Nil
         }else{
             panic!("dict-rm!: car is not dict");
@@ -87,7 +87,7 @@ fn dict_get(apply_args: &mut ApplyArgs) -> LispType {
             }else{
                 key.to_string()
             };
-            if let Some(val) = dict.read().get(&key){
+            if let Some(val) = dict.ref4read().get(&key){
                 val.clone()
             }else{
                 Nil
@@ -111,7 +111,7 @@ fn dict_put(apply_args: &mut ApplyArgs) -> LispType {
                 key.to_string()
             };
             let val = args.cdr().cdr().car();
-            dict.write().insert(key, val.clone());
+            dict.ref4write().insert(key, val.clone());
             Nil
         }else{
             panic!("dict-put!: car is not dict");
@@ -125,7 +125,7 @@ fn dict_clear(apply_args: &mut ApplyArgs) -> LispType {
     let args = apply_args.args();
     if args.len()==1{
         if let Dict( dict) = args.car(){
-            dict.write().clear();
+            dict.ref4write().clear();
             Nil
         }else{
             panic!("dict-clear!: car is not dict");
@@ -145,7 +145,7 @@ fn dict_contains_key(apply_args: &mut ApplyArgs) -> LispType {
             }else{
                 key.to_string()
             };
-            LispType::Boolean(dict.read().contains_key(&key))
+            LispType::Boolean(dict.ref4read().contains_key(&key))
         }else{
             panic!("dict-contains-key: car is not dict");
         }
@@ -158,7 +158,7 @@ fn dict_len(apply_args: &mut ApplyArgs) -> LispType {
     let args = apply_args.args();
     if args.len()==1{
         if let Dict( dict) = args.car(){
-            LispType::Number(dict.read().len() as isize)
+            LispType::Number(dict.ref4read().len() as isize)
         }else{
             panic!("dict-len: car is not dict");
         }
@@ -172,7 +172,7 @@ fn dict_keys2list(apply_args: &mut ApplyArgs) -> LispType {
     if args.len()==1{
         if let Dict( dict) = args.car(){
             let mut list = List::new();
-            for key in dict.read().keys(){
+            for key in dict.ref4read().keys(){
                 list.push(Strings(key.to_string()));
             }
             Expr(list)
@@ -189,7 +189,7 @@ fn dict_value2list(apply_args: &mut ApplyArgs) -> LispType {
     if args.len()==1{
         if let Dict( dict) = args.car(){
             let mut list = List::new();
-            for val in dict.read().values(){
+            for val in dict.ref4read().values(){
                 list.push(val.clone());
             }
             Expr(list)
@@ -209,7 +209,7 @@ fn dict2list(apply_args: &mut ApplyArgs) -> LispType {
     if args.len()==1{
         if let Dict( dict) = args.car(){
             let mut list = List::new();
-            for (key,val) in dict.read().iter(){
+            for (key,val) in dict.ref4read().iter(){
                 list.push(LispType::cons_of(Strings(key.to_string()), val.clone()));
             }
             Expr(list)

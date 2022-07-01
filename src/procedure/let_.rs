@@ -16,7 +16,7 @@ fn let_(apply_args: &mut ApplyArgs) -> LispType {
                     let value = kv.cdr().car().clone();
                     if let Symbol(s) = key {
                         let v = apply_args.inter(&value);
-                        env.write().define(&s, v);
+                        env.ref4write().define(&s, v);
                     } else {
                         panic!("let: invalid argument");
                     }
@@ -46,7 +46,7 @@ fn let_x(apply_args: &mut ApplyArgs) -> LispType {
                     let value = kv.cdr().car().clone();
                     if let Symbol(s) = key {
                         let v = apply_args.inter_4_env(&value, env.clone());
-                        env.write().define(&s, v);
+                        env.ref4write().define(&s, v);
                     } else {
                         panic!("let*: invalid argument");
                     }

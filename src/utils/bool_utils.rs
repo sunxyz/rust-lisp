@@ -1,4 +1,4 @@
-use crate::t::LispType::{self, *};
+use crate::types::LispType::{self, *};
 
 pub fn is_true(v: &LispType) -> bool {
     let v = v.clone();

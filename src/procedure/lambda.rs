@@ -1,6 +1,6 @@
 use super::*;
 
-fn lambda(apply_args: &mut ApplyArgs, lazy_eval: bool) -> Box<dyn Fn(&mut ApplyArgs) -> LispType> {
+fn lambda(apply_args: &mut ApplyArgs, lazy_eval: bool) -> Box<dyn Fn(&mut ApplyArgs) -> LispType + Sync + Send> {
     if let Expr(args_name) = apply_args.expr().car() {
         let body = Expr(apply_args.expr().cdr());
         let e = apply_args.env();
@@ -38,7 +38,7 @@ fn bind_args(args_name: List, args_val: List, env: RefEnv) {
                     if (args_name.len() == 2) {
                         let key = args_name.cdr().car().clone();
                         if let Symbol(name) = key {
-                            env.write().define(name.as_str(), Expr(args_val.clone()));
+                            env.ref4write().define(name.as_str(), Expr(args_val.clone()));
                             // println!("key:{} v:{}", name, args_val);
                         } else {
                             panic!("lambda: bind_args: key is not symbol");
@@ -49,7 +49,7 @@ fn bind_args(args_name: List, args_val: List, env: RefEnv) {
                     }
                 } else {
                     // println!("{}:{}", name, v);
-                    env.write().define(name.as_str(), v.clone());
+                    env.ref4write().define(name.as_str(), v.clone());
                 }
             }
             _ => {

@@ -1,6 +1,6 @@
 use std::ops::Index;
 
-use super::t::*;
+use super::types::*;
 
 static PREFIX: &'static str = "(";
 static SUFFIX: &'static str = ")";

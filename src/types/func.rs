@@ -1,10 +1,5 @@
-use super::*;
-use crate::env::Env;
-use crate::env::EnvOps;
-use crate::env::RefEnv;
-use crate::t::LispType::*;
-use std::cell::RefCell;
-use std::rc::Rc;
+use super::{LispType::{Procedure,Expr},*};
+use crate::env::{Env,RefEnv,EnvOps};
 
 pub struct ApplyArgs {
     expr: List,
@@ -94,7 +89,7 @@ impl ApplyArgs {
                     panic!("apply: invalid last argument");
                 }
             }
-            f.try_borrow().expect("locked err")(self)
+            f.ref4read()(self)
         } else {
             panic!("apply: invalid argument");
         }

@@ -1,4 +1,4 @@
-use crate::t::{LispType, IRef, RefOps, ref_};
+use crate::types::{LispType, IRef, RefOps, ref_};
 use std::collections::HashMap;
 
 pub type RefEnv = IRef<Env>;
@@ -41,7 +41,7 @@ impl EnvOps for Env {
                 if let Some(v) = env.get(key) {
                     Some(v.clone())
                 } else {
-                    parent.read().get(key)
+                    parent.ref4read().get(key)
                 }
             }
         }
@@ -54,7 +54,7 @@ impl EnvOps for Env {
                 if(env.contains_key(key)){
                     env.insert(key.to_string(), value);
                 } else{
-                    parent.write().set(key, value);
+                    parent.ref4write().set(key, value);
                 }
             }
         }

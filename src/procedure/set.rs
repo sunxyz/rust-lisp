@@ -4,7 +4,7 @@ fn set(apply_args: &mut ApplyArgs) -> LispType {
     let expr = apply_args.expr();
     if let Symbol(key) = expr.car() {
         let v = apply_args.inter(&Expr(expr.cdr()));
-        apply_args.env().write().set(key.as_str(), v);
+        apply_args.env().ref4write().set(key.as_str(), v);
         Nil
     } else {
         panic!("set!: invalid argument");

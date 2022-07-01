@@ -111,7 +111,7 @@ fn string_set(apply_args: &mut ApplyArgs) -> LispType {
                         .collect(),
                 );
                 if let Symbol(var) = apply_args.expr().car() {
-                    apply_args.env().write().set(&var, v);
+                    apply_args.env().ref4write().set(&var, v);
                     Nil
                 } else {
                     panic!("string-set!: not a symbol");

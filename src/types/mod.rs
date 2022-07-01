@@ -25,10 +25,10 @@ pub use self::cons_box::ConsBox;
 pub use self::list::List;
 pub use self::concurrency::ConcurrencyBox;
 
-pub type ProcedureBox =IRef<Box<dyn Fn(&mut ApplyArgs) -> LispType >>;
+pub type ProcedureBox =IRef<Box<dyn Fn(&mut ApplyArgs) -> LispType + Sync + Send>>;
 pub type VectorBox = IRef<Vec<LispType>>;
-pub type InputBox =  IRef<Box<dyn BufRead>>;
-pub type OutputBox = IRef<Box<dyn Write>>;
+pub type InputBox =  Arc<Mutex<Box<dyn BufRead + Send>>>;
+pub type OutputBox = Arc<Mutex<Box<dyn Write + Send>>>;
 pub type DictBox = IRef<HashMap<String, LispType>>;
 
 pub enum LispType {
@@ -87,7 +87,7 @@ impl Display for LispType {
             LispType::Vector(v, _) => write!(
                 f,
                 "#({})",
-                v.try_borrow().expect("vector lock error")
+                v.ref4read()
                     .iter()
                     .map(|x| x.to_string())
                     .collect::<Vec<String>>()
@@ -178,17 +178,17 @@ impl LispType {
         let len = vec.len() as usize;
         LispType::Vector(ref_::new(vec), len)
     }
-    pub fn procedure_of(f: Box<dyn Fn(&mut ApplyArgs) -> LispType >) -> LispType {
+    pub fn procedure_of(f: Box<dyn Fn(&mut ApplyArgs) -> LispType + Sync + Send>) -> LispType {
         LispType::Procedure(ref_::new(f))
     }
     pub fn dict_of(dict: HashMap<String, LispType>) -> LispType {
         LispType::Dict(ref_::new(dict))
     }
     pub fn input_of(input: Box<dyn BufRead + Send>) -> LispType {
-        LispType::Input(ref_::new(input))
+        LispType::Input(Arc::new(Mutex::new(input)))
     }
     pub fn output_of(output: Box<dyn Write + Send>) -> LispType {
-        LispType::Output(ref_::new(output))
+        LispType::Output(Arc::new(Mutex::new(output)))
     }
     pub fn concurrency_thread_of(join_handler: thread::JoinHandle<LispType>) -> LispType {
         LispType::Concurrency(ConcurrencyBox::THREAD( Arc::new(Mutex::new(Some(join_handler)))))

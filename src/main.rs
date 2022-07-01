@@ -15,7 +15,7 @@ mod env;
 mod interpreter;
 mod parser;
 mod procedure;
-mod t;
+mod types;
 mod utils;
 
 use env::{Env, EnvOps, RefEnv};
@@ -25,9 +25,8 @@ use std::{
     env as std_env,
     io::{self, Read, Write},
 };
-use t::{LispType::{self,Nil}, ApplyArgs};
+use types::{LispType::{self,Nil}, ApplyArgs, RefOps};
 
-use crate::t::RefOps;
 
 
 fn main() {
@@ -60,7 +59,7 @@ fn args_handler(){
 fn cmd_handler() {
 
     let root = Env::root();
-    procedure::init_procedure( &mut root.write());
+    procedure::init_procedure( &mut root.ref4write());
     let env = Env::extend( root);
     println!("\n\x1b[34m--------------------------\n welcome rust-lisp v0.1.0 \n--------------------------\x1b[0m \n \x1b[30msource code:https://github.com/sunxyz/rust-lisp \x1b[0m\n");
     let mut line = String::new();

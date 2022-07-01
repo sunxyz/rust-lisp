@@ -2,22 +2,22 @@ use crate::{
     env::Env,
     env::EnvOps,
     env::RefEnv,
-    t::{
+    types::{
         ApplyArgs,
         LispType::{self, *},
         List, ProcedureBox,
+        RefOps
     },
 };
 
 // use super::t::*;
 use super::parser::parser;
 use super::procedure::init_procedure;
-use super::t::RefOps;
 
 pub fn eval(exp: &str) -> Result<LispType, &str> {
     let root = Env::root();
     // let v = root.write();
-    init_procedure(&mut root.borrow_mut());
+    init_procedure(&mut root.ref4write());
     let env = Env::extend(root);
     let exp = parser(exp.to_string()).expect("parser error");
     Ok(interpreter(exp, env))
@@ -31,7 +31,7 @@ pub fn interpreter(exp: List, env: RefEnv) -> LispType {
     match car {
         Symbol(key) => {
             let v = env
-                .read()
+                .ref4read()
                 .get(key.as_str())
                 .expect(format!("undefined symbol: {}", key).as_str());
             if let Procedure(f) = v.clone() {
@@ -84,7 +84,7 @@ fn apply(
         t
     };
 
-    f.read()(&mut ApplyArgs::new(
+    f.ref4read()(&mut ApplyArgs::new(
         cdr,
         None,
         lazy_args_f,
@@ -97,7 +97,7 @@ fn interpreter0(o: &LispType, env: RefEnv) -> LispType {
     match o {
         Expr(l) => interpreter(l.clone(), env),
         Symbol(s) => env
-            .read()
+            .ref4read()
             .get(s.as_str())
             .expect(format!("undefined symbol {}", s.as_str()).as_str()),
         _ => o.clone(),

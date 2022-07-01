@@ -1,4 +1,3 @@
-use futures::join;
 
 use super::*;
 use std::{
@@ -11,13 +10,12 @@ fn thread_run(apply_args: &mut ApplyArgs) -> LispType {
     let proc = apply_args.args().car();
     let args = apply_args.args().cdr();
     if let Procedure(proc) = proc {
-        // let mut apply_args0 = apply_args.clone_of(Some(args));
+        let mut apply_args0 = apply_args.clone_of(Some(args));
 
-        // let join_handler = thread::Builder::new()
-        //     .name(format!("thread{}",THREAD_COUNT.fetch_add(1, std::sync::atomic::Ordering::SeqCst)).to_string())
-        //     .spawn(move || Mutex::new(proc.read()).try_lock().expect("xxx")(&mut apply_args0));
-        // LispType::concurrency_thread_of(join_handler.expect("thread error"))
-        Nil
+        let join_handler = thread::Builder::new()
+            .name(format!("thread{}",THREAD_COUNT.fetch_add(1, std::sync::atomic::Ordering::SeqCst)).to_string())
+            .spawn(move || proc.ref4read()(&mut apply_args0));
+        LispType::concurrency_thread_of(join_handler.expect("thread error"))
     } else {
         panic!("thread-run: not a procedure");
     }

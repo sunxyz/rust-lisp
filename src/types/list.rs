@@ -1,42 +1,34 @@
+use super::{LispType,ref_::{self, IRef, RefOps, RefRead, RefWrite}};
 // Cons list vector dict set
-use super::LispType;
-use std::cell::RefCell;
-use std::fmt::Display;
-use std::fmt::Formatter;
-use std::fmt::Result;
-use std::rc::Rc;
-use std::sync::Arc;
-use std::sync::RwLock;
+use std::fmt::{Display, Formatter,Result};
 
 enum ListType {
     SUB,
     EXPR,
 }
 
-pub struct List(Arc<RwLock<Vec<LispType>>>, ListType);
+pub struct List(IRef<Vec<LispType>>, ListType);
 
 impl List {
     pub fn new() -> Self {
-        List(Arc::new(RwLock::new(Vec::new())), ListType::EXPR)
+        List(ref_::new(Vec::new()), ListType::EXPR)
     }
 
     pub fn of(elem_s: Vec<LispType>) -> Self {
-        List(Arc::new(RwLock::new(elem_s)), ListType::EXPR)
+        List(ref_::new(elem_s), ListType::EXPR)
     }
 
     pub fn car(&self) -> LispType {
-        self.0.try_read().expect("locked car")[0].clone()
+        self.0.ref4read()[0].clone()
     }
 
-    
-
     pub fn cdr(&self) -> List {
-        let t = self.0.try_read().expect("locked list")[1..].to_vec();
-        List(Arc::new(RwLock::new(t)), ListType::SUB)
+        let t = self.0.ref4read()[1..].to_vec();
+        List(ref_::new(t), ListType::SUB)
     }
 
     pub fn is_nil(&self) -> bool {
-        self.0.try_read().expect("locked list").len() == 0
+        self.0.ref4read().len() == 0
     }
 
     pub fn is_expr(&self) -> bool {
@@ -56,25 +48,24 @@ impl List {
     }
 
     pub fn push(&mut self, elem: LispType) {
-        self.0.try_write().expect("locked list").push(elem);
+        self.0.ref4write().push(elem);
     }
 
     pub fn push_vec(&mut self, elem: Vec<LispType>) {
-        self.0.try_write().expect("locked list").extend(elem);
+        self.0.ref4write().extend(elem);
     }
 
     pub fn push_all(&mut self, elem: List) {
-        self.0.try_write().expect("locked list").extend(elem.data());
+        self.0.ref4write().extend(elem.data());
     }
 
     pub fn len(&self) -> usize {
-        self.0.try_read().expect("locked list").len()
+        self.0.ref4read().len()
     }
 
     pub fn data(&self) -> Vec<LispType> {
-        self.0.try_read().expect("locked list").clone()
+        self.0.ref4read().clone()
     }
-
 }
 
 impl Copy for ListType {}
@@ -93,7 +84,7 @@ impl Display for List {
             f,
             "({})",
             self.0
-                .try_read().expect("locked list")
+                .ref4read()
                 .iter()
                 .map(|x| x.to_string())
                 .collect::<Vec<String>>()
@@ -110,11 +101,11 @@ impl Clone for List {
 
 impl PartialEq for List {
     fn eq(&self, other: &Self) -> bool {
-        if self.0.try_read().expect("locked list").len() != other.0.try_read().expect("locked list").len() {
+        if self.0.ref4read().len() != other.0.ref4read().len() {
             return false;
         }
-        for i in 0..self.0.try_read().expect("locked list").len() {
-            if self.0.try_read().expect("locked list")[i] != other.0.try_read().expect("locked list")[i] {
+        for i in 0..self.0.ref4read().len() {
+            if self.0.ref4read()[i] != other.0.ref4read()[i] {
                 return false;
             }
         }

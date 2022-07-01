@@ -59,7 +59,7 @@ fn force(apply_args: &mut ApplyArgs) -> LispType {
                     let car = c.car();
                     if let Cons(cons) = car {
                         if let Procedure(proc) = cons.cdr() {
-                           let v = proc.read()(apply_args);
+                           let v = proc.ref4read()(apply_args);
                         //    println!("force: {}", v);
                            result.set_cdr(v.clone());
                            result.set_car(Boolean(true));

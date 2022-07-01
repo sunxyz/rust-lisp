@@ -72,7 +72,7 @@ fn vector_ref(apply_args: &mut ApplyArgs) -> LispType {
                 if i >= s as isize {
                     panic!("vector-ref: index out of range");
                 }
-                l.read()[i as usize].clone()
+                l.ref4read()[i as usize].clone()
             } else {
                 panic!("vector-ref: invalid argument");
             }
@@ -96,7 +96,7 @@ fn vector_set(apply_args: &mut ApplyArgs) -> LispType {
                 if i >= s as isize {
                     panic!("vector-set!: index out of range");
                 }
-                l.write()[i as usize] = list.cdr().cdr().car();
+                l.ref4write()[i as usize] = list.cdr().cdr().car();
                 Nil
             } else {
                 panic!("vector-set!: invalid argument");
@@ -115,7 +115,7 @@ fn vector_fill(apply_args: &mut ApplyArgs) -> LispType {
         if let Vector(l, s) = list.car() {
             let v = list.cdr().car();
             for i in 0..s {
-                l.write()[i] = v.clone();
+                l.ref4write()[i] = v.clone();
             }
             Nil
         } else {
@@ -134,7 +134,7 @@ fn vector2list(apply_args: &mut ApplyArgs) -> LispType {
     if let Vector(l, s) = list.car() {
         let mut vec = Vec::new();
         for i in 0..s {
-            vec.push(l.read()[i].clone());
+            vec.push(l.ref4read()[i].clone());
         }
         Expr(List::of(vec))
     } else {

@@ -221,7 +221,7 @@ fn map(apply_args: &mut ApplyArgs) -> LispType {
                 for o in last.iter() {
                     args.push(o.get(i).or(Some(&Nil)).unwrap().clone());
                 }
-                result.push(proc.read()(&mut apply_args.clone_of(Some(List::of(args)))));
+                result.push(proc.ref4read()(&mut apply_args.clone_of(Some(List::of(args)))));
             }
         } else {
             panic!("map: not a procedure");
@@ -246,7 +246,7 @@ fn filter(apply_args: &mut ApplyArgs) -> LispType {
                 return Expr(result);
             } else {
                 for elem in l.data() {
-                    if is_true(&proc.read()(
+                    if is_true(&proc.ref4read()(
                         &mut apply_args.clone_of(Some(List::of(vec![elem.clone()]))),
                     )) {
                         result.push(elem.clone());
@@ -276,7 +276,7 @@ fn reduce(apply_args: &mut ApplyArgs) -> LispType {
                 return result.clone();
             } else {
                 for elem in l.data() {
-                    result = proc.read()(
+                    result = proc.ref4read()(
                         &mut apply_args
                             .clone_of(Some(List::of(vec![result.clone(), elem.clone()]))),
                     );
@@ -310,7 +310,7 @@ fn for_each(apply_args: &mut ApplyArgs) -> LispType {
                 for o in last.iter() {
                     args.push(o.get(i).or(Some(&Nil)).unwrap().clone());
                 }
-                proc.read()(&mut apply_args.clone_of(Some(List::of(args))));
+                proc.ref4read()(&mut apply_args.clone_of(Some(List::of(args))));
             }
         } else {
             panic!("map: not a procedure");

@@ -1,9 +1,7 @@
-use std::fmt::Display;
-use std::sync::Barrier;
-use std::sync::RwLock;
+use std::fmt::{Display, Formatter,Result};
+
 use std::thread;
-use std::sync::Arc;
-use std::sync::Mutex;
+use std::sync::{Barrier,RwLock,Arc,Mutex};
 
 use super::LispType;
 
