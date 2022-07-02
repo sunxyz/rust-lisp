@@ -87,19 +87,23 @@ fn read_u8(apply_args: &mut ApplyArgs) -> LispType {
 
 fn read_byte_vector(apply_args: &mut ApplyArgs) -> LispType {
     let list = apply_args.args();
-    if list.len() == 0 {
-        if let Number(k) = list.car() {
-            let k = k as usize;
-            let mut v = vec![0u8; k];
+    if list.len() < 2{
+        let k = if list.len()==1 {
+            if let Number(k) = list.car() {
+                k as usize
+            }else{
+                panic!("read-byte-vector: not a number");
+            }
+        } else {
+           1024
+        };
+        let mut v = vec![0u8; k];
             std::io::stdin().read_exact(&mut v);
             let vec = v
                 .iter()
                 .map(|x| Byte(x.clone()))
                 .collect::<Vec<LispType>>();
             return LispType::vector_of(vec);
-        } else {
-            panic!("read-byte-vector: wrong number of arguments")
-        }
     } else if list.len() == 2 {
         let port = list.car();
         if let Input(io) = port {

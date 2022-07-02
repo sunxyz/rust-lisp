@@ -1,6 +1,8 @@
 use std::{
-    io::{BufReader, Read, Write},
+    io::{self, BufRead, BufReader, Read, Write},
     net::{TcpListener, TcpStream},
+    thread,
+    time::Duration,
 };
 
 use super::*;
@@ -13,10 +15,23 @@ fn call_with_tcp_listener(apply_args: &mut ApplyArgs) -> LispType {
         if let Procedure(proc) = args.cdr().car() {
             // let p = proc.as_ref();
             let listener = TcpListener::bind(addr).unwrap();
+            // listener
+            //     .set_nonblocking(true)
+            //     .expect("Cannot set non-blocking");
             for stream in listener.incoming() {
-                let stream = stream.unwrap();
-
-                handle_connection(stream, apply_args, &proc);
+                match stream {
+                    Ok(s) => {
+                        let apply_args = apply_args.clone();
+                        let proc = proc.clone();
+                        handle_connection(s, apply_args, proc);
+                    }
+                    Err(ref e) if e.kind() == io::ErrorKind::WouldBlock => {
+                        // wait until network socket is ready, typically implemented
+                        // via platform-specific APIs such as epoll or IOCP
+                        continue;
+                    }
+                    Err(e) => panic!("encountered IO error: {}", e),
+                }
             }
         } else {
             panic!("call_with_tcp_listener: not a proc")
@@ -27,22 +42,26 @@ fn call_with_tcp_listener(apply_args: &mut ApplyArgs) -> LispType {
     Nil
 }
 
-fn handle_connection(
-    mut stream: TcpStream,
-    apply_args: &mut ApplyArgs,
-    proc: &ProcedureBox,
-) {
-    // let mut buffer = [0; 1024];
-    // stream.read(&mut buffer).unwrap();
-    let read = BufReader::new(stream.try_clone().expect("tcp stream error"));
-    let input = LispType::input_of(Box::new(read));
-    // stream
-    let args = Some(List::of(vec![input]));
-    let res = proc.ref4read()(&mut apply_args.clone_of(args));
 
-    let response = res.to_string();
-    stream.write(response.as_bytes()).unwrap();
-    stream.flush().unwrap();
+
+fn handle_connection(mut stream: TcpStream, mut apply_args: ApplyArgs, proc: ProcedureBox) {
+    let mut reader = BufReader::new(stream.try_clone().expect("tcp stream error"));
+
+    let mut buffer = [0; 8];
+    reader.read(&mut buffer).unwrap();
+
+    let res = proc.ref4read()(
+        &mut apply_args.clone_of(Some(List::of(vec![LispType::input_of(Box::new(reader))]))),
+    );
+    let response = if let Strings(str) = res {
+        str
+    } else {
+        res.to_string()
+    };
+    stream
+        .write(response.as_bytes())
+        .expect("failed to write to stream");
+    stream.flush().expect("failed to flush stream");
 }
 
 pub fn reg_procedure(env: &mut Env) {
