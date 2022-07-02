@@ -46,7 +46,7 @@ fn handle_connection(mut stream: TcpStream, mut apply_args: ApplyArgs, proc: Pro
     let mut reader = BufReader::new(stream.try_clone().expect("tcp stream error"));
     let writer = Box::new(stream.try_clone().expect("tcp stream error"));
 
-    let mut buffer = [0; 8];
+    let mut buffer = [0; 0];
     reader.read(&mut buffer).unwrap();
 
     let res = proc.ref4read()(&mut apply_args.clone_of(Some(List::of(vec![
