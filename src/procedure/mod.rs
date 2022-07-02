@@ -30,6 +30,7 @@ mod lazy_evaluation;
 mod time;
 mod io;
 mod concurrency;
+mod os;
 
 
 use crate::env::{Env, EnvOps, RefEnv};
@@ -89,4 +90,5 @@ pub fn init_procedure(env: &mut Env) {
     time::reg_procedure(env);
     io::reg_procedure(env);
     concurrency::reg_procedure(env);
+    os::reg_procedure(env);
 }

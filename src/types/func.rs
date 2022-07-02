@@ -91,7 +91,9 @@ impl ApplyArgs {
             }
             f.ref4read()(self)
         } else {
-            panic!("apply: invalid argument");
+            // panic!("apply: invalid argument");
+            let v  = args.car();
+            self.inter(& v)
         }
     }
 }
