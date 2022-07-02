@@ -42,26 +42,33 @@ fn call_with_tcp_listener(apply_args: &mut ApplyArgs) -> LispType {
     Nil
 }
 
-
-
 fn handle_connection(mut stream: TcpStream, mut apply_args: ApplyArgs, proc: ProcedureBox) {
     let mut reader = BufReader::new(stream.try_clone().expect("tcp stream error"));
+    let writer = Box::new(stream.try_clone().expect("tcp stream error"));
 
     let mut buffer = [0; 8];
     reader.read(&mut buffer).unwrap();
 
-    let res = proc.ref4read()(
-        &mut apply_args.clone_of(Some(List::of(vec![LispType::input_of(Box::new(reader))]))),
-    );
-    let response = if let Strings(str) = res {
-        str
-    } else {
-        res.to_string()
-    };
-    stream
-        .write(response.as_bytes())
-        .expect("failed to write to stream");
-    stream.flush().expect("failed to flush stream");
+    let res = proc.ref4read()(&mut apply_args.clone_of(Some(List::of(vec![
+        LispType::input_of(Box::new(reader)),
+        LispType::output_of(writer),
+    ]))));
+    if let Nil = res{
+        
+    } if let Concurrency(_) = res {
+
+    }else{
+        let response = if let Strings(str) = res {
+            str
+        } else {
+            res.to_string()
+        };
+        stream
+            .write(response.as_bytes())
+            .expect("failed to write to stream");
+        stream.flush().expect("failed to flush stream");
+    }
+    
 }
 
 pub fn reg_procedure(env: &mut Env) {
