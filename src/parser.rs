@@ -117,7 +117,7 @@ fn parse_atom(s: &str) -> Result<LispType, String> {
 
 fn peel_onions(s:&str, keys:Vec<&str>)->LispType{
     for  key in keys{
-        if s.starts_with(key){
+        if s.starts_with(key)&&s.len()>key.len(){
             return LispType::expr_of(vec![LispType::Symbol(key.to_string()),LispType::Symbol(s[key.len()..].to_string())]);
         }
     }
