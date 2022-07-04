@@ -5,16 +5,15 @@
     (define channel (make-channel))
     (while (<  thread-count thread-qty)
         (  
-            (thread-run (lambda () (
+            (thread-run (^(
                 (channel-for-each (lambda (task) (
-                    ( task)
+                    (task)
                 )) channel)
                 (barrier-wait barrier)
-                ;; (loop ((<- channel)))
             )))
             (set! thread-count (+ thread-count 1))))
-    (define go (lambda-lep (task) (
-       (apply (`(-> ,channel ,task)))
-    )))
+    (def go (task) (
+      -> channel task
+    ))
     (export go)
 )

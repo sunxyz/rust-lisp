@@ -32,6 +32,6 @@
     ;; (sleep 1000)
     ;;  sample 4
     (call-with-tcp-listener "127.0.0.1:8088" ( lambda (in out) (
-        (go (lambda () (handler in out)))
+        (go (^ handler in out))
     )))
 )

@@ -39,4 +39,7 @@
         (define export-info (load file))
         (`(,@(map (lambda (n) (`(define ,n (dict-get ,export-info (symbol->string ,n))))) names)))
     )))
+    (define-macro ^(lambda (. exp) (
+       `(lambda () ,exp)
+    )))
 )
