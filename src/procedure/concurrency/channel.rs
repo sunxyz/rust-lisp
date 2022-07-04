@@ -8,9 +8,9 @@ fn channel_send(apply_args: &mut ApplyArgs) -> LispType {
     apply_args.check_args_num(2);
     let list = apply_args.args();
     let car = list.car();
-    let cdr = list.cdr();
-    if let Concurrency(ConcurrencyBox::Channel(tx, rx)) = car {
-        tx.send(cdr.car()).expect("channel send error");
+    let cdr = list.cdr().car();
+    if let Concurrency(ConcurrencyBox::Channel(tx, rx)) = cdr {
+        tx.send(car).expect("channel send error");
         Nil
     } else {
         panic!("channel-send: not a channel");

@@ -13,7 +13,7 @@
             )))
             (set! thread-count (+ thread-count 1))))
     (def go (task) (
-      -> channel task
+      -> task channel
     ))
     (export go)
 )
