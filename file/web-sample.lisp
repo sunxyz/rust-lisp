@@ -5,7 +5,7 @@
     (def handler (in out) (
         ;; (sleep 1)
         (println (current-thread-name))
-        (display  (req-read-string in))
+        (display  (read-line in))
         (write-string "HTTP/1.1 200 OK\r\n\r\n hello word" out )
     ))
     (def tcp-listener (port) (
