@@ -89,6 +89,26 @@ or
     )) chan))
 ```
 **web-sample**
+* lib.lisp
+```
+(
+    (define-macro def (lambda (name args . body) (`(define ,name (lambda ,args ,@body)))))
+    (define-macro println (lambda (. args) (`((display ,@args) (newline) ))))
+    (define-macro loop (lambda (. exp) (
+        `(while (#t) ,exp)
+    )))
+    (define-macro export (lambda (. exports) (
+       ` (dict (list ,@(map symbol->string exports)) (list ,@exports))
+    )))
+    (define-macro import (lambda (names form file)(
+        (define export-info (load file))
+        (`(,@(map (lambda (n) (`(define ,n (dict-get ,export-info (symbol->string ,n))))) names)))
+    )))
+    (define-macro ^ (lambda (. exp) (
+       `(lambda () ,exp)
+    )))
+)
+```
 * async.lisp
 ```
 (
