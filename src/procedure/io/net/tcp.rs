@@ -53,22 +53,23 @@ fn handle_connection(mut stream: TcpStream, mut apply_args: ApplyArgs, proc: Pro
         LispType::input_of(Box::new(reader)),
         LispType::output_of(writer),
     ]))));
-    if let Nil = res{
-        
-    } if let Concurrency(_) = res {
-
-    }else{
+    if let Nil = res {}
+    if let Concurrency(_) = res {
+    } else {
         let response = if let Strings(str) = res {
             str
         } else {
             res.to_string()
         };
-        stream
-            .write(response.as_bytes())
-            .expect("failed to write to stream");
-        stream.flush().expect("failed to flush stream");
+        if stream.write(response.as_bytes()).is_ok() {
+            stream.flush().expect("failed to flush stream");
+        }else {
+            // 重试
+            if(stream.write(response.as_bytes()).is_ok()){
+                stream.flush().expect("failed to flush stream");
+            }
+        }
     }
-    
 }
 
 pub fn reg_procedure(env: &mut Env) {
