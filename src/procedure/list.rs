@@ -5,7 +5,7 @@ use std::cell::RefCell;
 fn is_list(apply_args: &mut ApplyArgs) -> LispType {
     let list = apply_args.args();
     if (list.len() != 1) {
-        panic!("list?: wrong number of arguments");
+        panic!("list?: wrong integer of arguments");
     }
     let arg = list.car();
     if let Expr(l) = arg {
@@ -22,7 +22,7 @@ fn list(apply_args: &mut ApplyArgs) -> LispType {
 fn list_eq(apply_args: &mut ApplyArgs) -> LispType {
     let list = apply_args.args();
     if (list.len() != 2) {
-        panic!("list=?: wrong number of arguments");
+        panic!("list=?: wrong integer of arguments");
     }
     let arg1 = list.car();
     let arg2 = list.cdr().car();
@@ -32,11 +32,11 @@ fn list_eq(apply_args: &mut ApplyArgs) -> LispType {
 fn list_length(apply_args: &mut ApplyArgs) -> LispType {
     let list = apply_args.args();
     if (list.len() != 1) {
-        panic!("list-length: wrong number of arguments");
+        panic!("list-length: wrong integer of arguments");
     }
     let arg = list.car();
     if let Expr(l) = arg {
-        Number(l.len() as isize)
+        LispType::integer_of(l.len() as isize)
     } else {
         panic!("list-length: not a list");
     }
@@ -45,22 +45,19 @@ fn list_length(apply_args: &mut ApplyArgs) -> LispType {
 fn list_ref(apply_args: &mut ApplyArgs) -> LispType {
     let list = apply_args.args();
     if (list.len() != 2) {
-        panic!("list-ref: wrong number of arguments");
+        panic!("list-ref: wrong integer of arguments");
     }
     let arg = list.car();
     if let Expr(l) = arg {
         let index = list.cdr().car();
-        if let Number(i) = index {
-            if i < 0 {
-                panic!("list-ref: index out of range");
-            }
-            if i >= l.len() as isize {
-                panic!("list-ref: index out of range");
-            }
-            l.data()[i as usize].clone()
-        } else {
-            panic!("list-ref: not a number");
+        let index = get_int(&index).expect("list-ref: invalid argument");
+        if index < 0 {
+            panic!("list-ref: index out of range");
         }
+        if index >= l.len() as isize {
+            panic!("list-ref: index out of range");
+        }
+        l.data()[index as usize].clone()
     } else {
         panic!("list-ref: not a list");
     }
@@ -69,22 +66,19 @@ fn list_ref(apply_args: &mut ApplyArgs) -> LispType {
 fn list_tail(apply_args: &mut ApplyArgs) -> LispType {
     let list = apply_args.args();
     if (list.len() != 2) {
-        panic!("list-tail: wrong number of arguments");
+        panic!("list-tail: wrong integer of arguments");
     }
     let arg = list.car();
     if let Expr(l) = arg {
         let index = list.cdr().car();
-        if let Number(i) = index {
-            if i < 0 {
-                panic!("list-tail: index out of range");
-            }
-            if i >= l.len() as isize {
-                panic!("list-tail: index out of range");
-            }
-            Expr(List::of(l.data()[i as usize..].to_vec()))
-        } else {
-            panic!("list-tail: not a number");
+        let i = get_int(&index).expect("list-tail: invalid argument");
+        if i < 0 {
+            panic!("list-tail: index out of range");
         }
+        if i >= l.len() as isize {
+            panic!("list-tail: index out of range");
+        }
+        Expr(List::of(l.data()[i as usize..].to_vec()))
     } else {
         panic!("list-tail: not a list");
     }
@@ -93,23 +87,20 @@ fn list_tail(apply_args: &mut ApplyArgs) -> LispType {
 fn list_set(apply_args: &mut ApplyArgs) -> LispType {
     let list = apply_args.args();
     if (list.len() != 3) {
-        panic!("list-set!: wrong number of arguments");
+        panic!("list-set!: wrong integer of arguments");
     }
     let arg = list.car();
     if let Expr(l) = arg {
         let index = list.cdr().car();
-        if let Number(i) = index {
-            if i < 0 {
-                panic!("list-set!: index out of range");
-            }
-            if i >= l.len() as isize {
-                panic!("list-set!: index out of range");
-            }
-            l.data()[i as usize] = list.cdr().cdr().car().clone();
-            Expr(l)
-        } else {
-            panic!("list-set!: not a number");
+        let i = get_int(&index).expect("list-set: invalid argument");
+        if i < 0 {
+            panic!("list-set!: index out of range");
         }
+        if i >= l.len() as isize {
+            panic!("list-set!: index out of range");
+        }
+        l.data()[i as usize] = list.cdr().cdr().car().clone();
+        Expr(l)
     } else {
         panic!("list-set!: not a list");
     }
@@ -118,7 +109,7 @@ fn list_set(apply_args: &mut ApplyArgs) -> LispType {
 fn append(apply_args: &mut ApplyArgs) -> LispType {
     let list = apply_args.args();
     if (list.len() < 1) {
-        panic!("append: wrong number of arguments");
+        panic!("append: wrong integer of arguments");
     }
     let result = list.car().clone();
     let args = list.cdr();
@@ -140,7 +131,7 @@ fn append(apply_args: &mut ApplyArgs) -> LispType {
 fn add(apply_args: &mut ApplyArgs) -> LispType {
     let list = apply_args.args();
     if (list.len() < 1) {
-        panic!("append: wrong number of arguments");
+        panic!("append: wrong integer of arguments");
     }
     let result = list.car().clone();
     let args = list.cdr();
@@ -158,7 +149,7 @@ fn add(apply_args: &mut ApplyArgs) -> LispType {
 fn reverse(apply_args: &mut ApplyArgs) -> LispType {
     let list = apply_args.args();
     if (list.len() != 1) {
-        panic!("reverse: wrong number of arguments");
+        panic!("reverse: wrong integer of arguments");
     }
     let arg = list.car();
     if let Expr(l) = arg {
@@ -172,7 +163,7 @@ fn reverse(apply_args: &mut ApplyArgs) -> LispType {
 fn list2vector(apply_args: &mut ApplyArgs) -> LispType {
     let list = apply_args.args();
     if (list.len() != 1) {
-        panic!("list->vector: wrong number of arguments");
+        panic!("list->vector: wrong integer of arguments");
     }
     let arg = list.car();
     if let Expr(l) = arg {
@@ -185,7 +176,7 @@ fn list2vector(apply_args: &mut ApplyArgs) -> LispType {
 fn list2string(apply_args: &mut ApplyArgs) -> LispType {
     let list = apply_args.args();
     if (list.len() != 1) {
-        panic!("list->string: wrong number of arguments");
+        panic!("list->string: wrong integer of arguments");
     }
     let arg = list.car();
     if let Expr(l) = arg {
@@ -204,7 +195,7 @@ fn list2string(apply_args: &mut ApplyArgs) -> LispType {
 fn map(apply_args: &mut ApplyArgs) -> LispType {
     let list = apply_args.args();
     if (list.len() < 2) {
-        panic!("map: wrong number of arguments");
+        panic!("map: wrong integer of arguments");
     }
     let proc = list.car();
     let v = list.cdr().car();
@@ -235,7 +226,7 @@ fn map(apply_args: &mut ApplyArgs) -> LispType {
 fn filter(apply_args: &mut ApplyArgs) -> LispType {
     let list = apply_args.args();
     if (list.len() != 2) {
-        panic!("filter: wrong number of arguments");
+        panic!("filter: wrong integer of arguments");
     }
     let proc = list.car();
     let args = list.cdr().car();
@@ -265,7 +256,7 @@ fn filter(apply_args: &mut ApplyArgs) -> LispType {
 fn reduce(apply_args: &mut ApplyArgs) -> LispType {
     let list = apply_args.args();
     if (list.len() != 3) {
-        panic!("reduce: wrong number of arguments");
+        panic!("reduce: wrong integer of arguments");
     }
     let proc = list.car();
     let mut result = list.cdr().car();
@@ -294,7 +285,7 @@ fn reduce(apply_args: &mut ApplyArgs) -> LispType {
 fn for_each(apply_args: &mut ApplyArgs) -> LispType {
     let list = apply_args.args();
     if (list.len() < 2) {
-        panic!("for-each: wrong number of arguments");
+        panic!("for-each: wrong integer of arguments");
     }
     let proc = list.car();
     let v = list.cdr().car();

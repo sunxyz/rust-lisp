@@ -20,20 +20,16 @@ fn mark_string(apply_args: &mut ApplyArgs) -> LispType {
     if (list.len() < 1) {
         panic!("mark_string: wrong number of arguments");
     }
-    let size = list.car();
-    if let Number(n) = size {
-        if (list.len() == 2) {
-            let arg = list.cdr().car();
-            if let Char(c) = arg {
-                Strings(c.to_string().repeat(n as usize))
-            } else {
-                panic!("mark-string: not a string");
-            }
+    let size = get_usize(&list.car()).expect("mark-string: invalid argument");
+    if (list.len() == 2) {
+        let arg = list.cdr().car();
+        if let Char(c) = arg {
+            Strings(c.to_string().repeat(size))
         } else {
-            Strings(" ".repeat(n as usize))
+            panic!("mark-string: not a string");
         }
     } else {
-        panic!("mark-string: not a len");
+        Strings(" ".repeat(size))
     }
 }
 
@@ -62,7 +58,7 @@ fn string_length(apply_args: &mut ApplyArgs) -> LispType {
     }
     let arg = list.car();
     if let Strings(s) = arg {
-        Number(s.len() as isize)
+        LispType::integer_of(s.len() as isize)
     } else {
         panic!("string_length: not a string");
     }
@@ -75,15 +71,11 @@ fn string_ref(apply_args: &mut ApplyArgs) -> LispType {
     }
     let arg = list.car();
     if let Strings(s) = arg {
-        let index = list.cdr().car();
-        if let Number(n) = index {
-            if (n < 0) || (n >= s.len() as isize) {
-                panic!("string-ref: index out of range");
-            }
-            Char(s.chars().nth(n as usize).unwrap())
-        } else {
-            panic!("string_ref: not a number");
+        let n = get_int(&list.cdr().car()).expect("string-ref: invalid argument");
+        if (n < 0) || (n >= s.len() as isize) {
+            panic!("string-ref: index out of range");
         }
+        Char(s.chars().nth(n as usize).unwrap())
     } else {
         panic!("string-ref: not a string");
     }
@@ -97,30 +89,27 @@ fn string_set(apply_args: &mut ApplyArgs) -> LispType {
     let arg = list.car();
     if let Strings(s) = arg {
         let index = list.cdr().car();
-        if let Number(n) = index {
-            if (n < 0) || (n >= s.len() as isize) {
-                panic!("string_set: index out of range");
-            }
-            let c = list.cdr().cdr().car();
-            if let Char(c) = c {
-                let v = Strings(
-                    s.chars()
-                        .take(n as usize)
-                        .chain(c.to_string().chars())
-                        .chain(s.chars().skip(n as usize + 1))
-                        .collect(),
-                );
-                if let Symbol(var) = apply_args.expr().car() {
-                    apply_args.env().ref4write().set(&var, v);
-                    Nil
-                } else {
-                    panic!("string-set!: not a symbol");
-                }
+        let n = get_int(&index).expect("string-set: invalid argument");
+        if (n < 0) || (n >= s.len() as isize) {
+            panic!("string_set: index out of range");
+        }
+        let c = list.cdr().cdr().car();
+        if let Char(c) = c {
+            let v = Strings(
+                s.chars()
+                    .take(n as usize)
+                    .chain(c.to_string().chars())
+                    .chain(s.chars().skip(n as usize + 1))
+                    .collect(),
+            );
+            if let Symbol(var) = apply_args.expr().car() {
+                apply_args.env().ref4write().set(&var, v);
+                Nil
             } else {
-                panic!("string-set!: not a char");
+                panic!("string-set!: not a symbol");
             }
         } else {
-            panic!("string-set!: not a number");
+            panic!("string-set!: not a char");
         }
     } else {
         panic!("string-set!: not a string");
@@ -134,26 +123,18 @@ fn substring(apply_args: &mut ApplyArgs) -> LispType {
     }
     let arg = list.car();
     if let Strings(s) = arg {
-        let start = list.cdr().car();
-        if let Number(start) = start {
-            if (start < 0) || (start >= s.len() as isize) {
-                panic!("substring: start out of range");
-            }
-            let end = list.cdr().cdr().car();
-            if let Number(end) = end {
-                if (end < 0) || (end >= s.len() as isize) {
-                    panic!("substring: end out of range");
-                }
-                if (end < start) {
-                    panic!("substring: end < start");
-                }
-                Strings(s[start as usize..end as usize].to_string())
-            } else {
-                panic!("substring: not a end");
-            }
-        } else {
-            panic!("substring: not a start");
+        let start = get_int(&list.cdr().car()).expect("substring: invalid argument");
+        if (start < 0) || (start >= s.len() as isize) {
+            panic!("substring: start out of range");
         }
+        let end = get_int(&list.cdr().cdr().car()).expect("substring: not a end");
+        if (end < 0) || (end >= s.len() as isize) {
+            panic!("substring: end out of range");
+        }
+        if (end < start) {
+            panic!("substring: end < start");
+        }
+        Strings(s[start as usize..end as usize].to_string())
     } else {
         panic!("substring: not a string");
     }
@@ -192,28 +173,22 @@ fn string_copy(apply_args: &mut ApplyArgs) -> LispType {
         let mut end0 = s.len();
         if list.len() > 1 {
             let start = list.cdr().car();
-            if let Number(start) = start {
-                if (start < 0) || (start >= s.len() as isize) {
-                    panic!("string-copy: start out of range");
-                }
-                start0 = start;
-            } else {
-                panic!("string-copy: not a start");
+            let start = get_int(&start).expect("string-copy: not a start");
+            if (start < 0) || (start >= s.len() as isize) {
+                panic!("string-copy: start out of range");
             }
+            start0 = start;
         }
         if list.len() > 2 {
             let end = list.cdr().cdr().car();
-            if let Number(end) = end {
-                if (end < 0) || (end >= s.len() as isize) {
-                    panic!("string-copy: end out of range");
-                }
-                if (end < start0) {
-                    panic!("string-copy: end < start");
-                }
-                end0 = end as usize;
-            } else {
-                panic!("string-copy: not a end");
+            let end = get_int(&end).expect("string-copy: not a end");
+            if (end < 0) || (end >= s.len() as isize) {
+                panic!("string-copy: end out of range");
             }
+            if (end < start0) {
+                panic!("string-copy: end < start");
+            }
+            end0 = end as usize;
         }
         Strings(s[start0 as usize..end0].to_string())
     } else {
@@ -231,8 +206,8 @@ fn string_find(apply_args: &mut ApplyArgs) -> LispType {
         let str = list.cdr().car();
         if let Strings(c) = str {
             s.find(c.as_str())
-                .map(|n| Number(n as isize))
-                .unwrap_or(Number(-1))
+                .map(|n| LispType::integer_of(n as isize))
+                .unwrap_or(LispType::integer_of(-1))
         } else {
             panic!("string-find: not a string");
         }
@@ -332,7 +307,7 @@ fn string2number(apply_args: &mut ApplyArgs) -> LispType {
     let arg = list.car();
     if let Strings(s) = arg {
         let n = s.parse::<isize>().unwrap();
-        Number(n)
+        LispType::integer_of(n)
     } else {
         panic!("string->number: not a string");
     }

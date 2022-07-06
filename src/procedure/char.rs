@@ -3,7 +3,7 @@ use super::*;
 fn is_char(apply_args: &mut ApplyArgs) -> LispType {
     let list = apply_args.args();
     if list.len() != 1 {
-        panic!("wrong number of arguments");
+        panic!("wrong integer of arguments");
     }
     match list.car() {
         Char(_) => Boolean(true),
@@ -14,7 +14,7 @@ fn is_char(apply_args: &mut ApplyArgs) -> LispType {
 fn char_eq(apply_args: &mut ApplyArgs) -> LispType {
     let list = apply_args.args();
     if (list.len() != 2) {
-        panic!("char=?: wrong number of arguments");
+        panic!("char=?: wrong integer of arguments");
     }
     let arg1 = list.car();
     let arg2 = list.cdr().car();
@@ -32,20 +32,20 @@ fn char_eq(apply_args: &mut ApplyArgs) -> LispType {
 fn char2integer(apply_args: &mut ApplyArgs) -> LispType {
     let list = apply_args.args();
     if (list.len() != 1) {
-        panic!("char->number: wrong number of arguments");
+        panic!("char->integer: wrong integer of arguments");
     }
     let arg = list.car();
     if let Char(c) = arg {
-        Number(c as isize)
+        LispType::integer_of(c as isize)
     } else {
-        panic!("char->number: not a char");
+        panic!("char->integer: not a char");
     }
 }
 
 fn char_up_case(apply_args: &mut ApplyArgs) -> LispType {
     let list = apply_args.args();
     if (list.len() != 1) {
-        panic!("char-upcase: wrong number of arguments");
+        panic!("char-upcase: wrong integer of arguments");
     }
     let arg = list.car();
     if let Char(c) = arg {
@@ -58,7 +58,7 @@ fn char_up_case(apply_args: &mut ApplyArgs) -> LispType {
 fn char_down_case(apply_args: &mut ApplyArgs) -> LispType {
     let list = apply_args.args();
     if (list.len() != 1) {
-        panic!("char-downcase: wrong number of arguments");
+        panic!("char-downcase: wrong integer of arguments");
     }
     let arg = list.car();
     if let Char(c) = arg {
@@ -71,12 +71,12 @@ fn char_down_case(apply_args: &mut ApplyArgs) -> LispType {
 fn digit_value(apply_args: &mut ApplyArgs) -> LispType {
     let list = apply_args.args();
     if (list.len() != 1) {
-        panic!("digit-value: wrong number of arguments");
+        panic!("digit-value: wrong integer of arguments");
     }
     let arg = list.car();
     if let Char(c) = arg {
         if c.is_digit(10) {
-            Number(c as isize - '0' as isize)
+            LispType::integer_of(c as isize - '0' as isize)
         } else {
             panic!("digit-value: not a digit");
         }

@@ -24,12 +24,9 @@ fn thread_run(apply_args: &mut ApplyArgs) -> LispType {
 fn sleep(apply_args: &mut ApplyArgs) -> LispType {
     apply_args.check_args_num(1);
     let num = apply_args.args().car();
-    if let Number(num) = num {
-        thread::sleep(std::time::Duration::from_millis(num as u64));
-        Nil
-    } else {
-        panic!("sleep: not a number");
-    }
+    let num = get_usize(&num).expect("sleep: invalid argument");
+    thread::sleep(std::time::Duration::from_millis(num as u64));
+    Nil
 }
 
 fn join(apply_args: &mut ApplyArgs) -> LispType {
@@ -43,13 +40,13 @@ fn join(apply_args: &mut ApplyArgs) -> LispType {
     }
 }
 
-fn get_current_thread_name(apply_args: &mut ApplyArgs) -> LispType{
+fn integer(apply_args: &mut ApplyArgs) -> LispType{
    Strings( thread::current().name().unwrap_or("<unnamed>").to_string())
 }
 
 pub fn reg_procedure(env: &mut Env) {
     env.reg_procedure("thread-run", thread_run);
-    env.reg_procedure("current-thread-name", get_current_thread_name);
+    env.reg_procedure("current-thread-name", integer);
     env.reg_procedure("sleep", sleep);
     env.reg_procedure("join", join);
 }

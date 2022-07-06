@@ -1,7 +1,7 @@
 use super::*;
 use std::time::{SystemTime, UNIX_EPOCH};
 fn current_second(apply_args: &mut ApplyArgs) -> LispType {
-    LispType::Number(
+    LispType::integer_of(
         SystemTime::now()
             .duration_since(UNIX_EPOCH)
             .unwrap()

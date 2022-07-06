@@ -1,4 +1,5 @@
 mod cons_box;
+mod number_box;
 mod func;
 mod list;
 mod concurrency;
@@ -24,6 +25,7 @@ pub use self::func::ApplyArgs;
 pub use self::cons_box::ConsBox;
 pub use self::list::List;
 pub use self::concurrency::ConcurrencyBox;
+pub use self::number_box::NumberBox;
 
 pub type ProcedureBox =IRef<Box<dyn Fn(&mut ApplyArgs) -> LispType + Sync + Send>>;
 pub type VectorBox = IRef<Vec<LispType>>;
@@ -32,7 +34,7 @@ pub type OutputBox = Arc<Mutex<Box<dyn Write + Send>>>;
 pub type DictBox = IRef<HashMap<String, LispType>>;
 
 pub enum LispType {
-    Number(isize),
+    Number(NumberBox),
     Symbol(String),
     Strings(String),
     Char(char),
@@ -52,7 +54,7 @@ pub enum LispType {
 impl Clone for LispType {
     fn clone(&self) -> Self {
         match self {
-            LispType::Number(n) => LispType::Number(*n),
+            LispType::Number(n) => LispType::Number(n.clone()),
             LispType::Symbol(s) => LispType::Symbol(s.clone()),
             LispType::Strings(s) => LispType::Strings(s.clone()),
             LispType::Boolean(b) => LispType::Boolean(*b),
@@ -74,7 +76,7 @@ impl Clone for LispType {
 impl Display for LispType {
     fn fmt(&self, f: &mut Formatter) -> Result {
         match self {
-            LispType::Number(i) => write!(f, "{}", i),
+            LispType::Number(n) => write!(f, "{}", n),
             LispType::Symbol(s) => write!(f, "{}", s),
             LispType::Strings(s) => write!(f, "{}", s),
             LispType::Boolean(b) => write!(f, "{}", if *b { "#t" } else { "#f" }),
@@ -168,6 +170,12 @@ impl PartialEq for LispType {
     }
 }
 impl LispType {
+    pub fn integer_of(n:isize)->LispType{
+        LispType::Number(NumberBox::Integer(n))
+    }
+    pub fn float_of(n:f64)->LispType{
+        LispType::Number(NumberBox::Float(n))
+    }
     pub fn cons_of(car: LispType, cdr: LispType) -> LispType {
         LispType::Cons(ConsBox::new(car, cdr))
     }

@@ -158,7 +158,7 @@ fn dict_len(apply_args: &mut ApplyArgs) -> LispType {
     let args = apply_args.args();
     if args.len()==1{
         if let Dict( dict) = args.car(){
-            LispType::Number(dict.ref4read().len() as isize)
+            LispType::integer_of(dict.ref4read().len() as isize)
         }else{
             panic!("dict-len: car is not dict");
         }

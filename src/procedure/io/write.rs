@@ -5,7 +5,7 @@ use std::io::{ Write};
 fn write_char(apply_args: &mut ApplyArgs) -> LispType {
     let list = apply_args.args();
     if list.len() == 0 {
-        panic!("write-char: wrong number of arguments");
+        panic!("write-char: wrong integer of arguments");
     } else {
         let w = list.car();
         if let Char(c) = w {
@@ -20,7 +20,7 @@ fn write_char(apply_args: &mut ApplyArgs) -> LispType {
                     panic!("write-char: not a port");
                 }
             } else {
-                panic!("write-char: wrong number of arguments");
+                panic!("write-char: wrong integer of arguments");
             }
         } else {
             panic!("write-char: not a char");
@@ -32,30 +32,22 @@ fn write_char(apply_args: &mut ApplyArgs) -> LispType {
 fn write_string(apply_args: &mut ApplyArgs) -> LispType {
     let list = apply_args.args().data();
     if list.len() == 0 {
-        panic!("write-string: wrong number of arguments");
+        panic!("write-string: wrong integer of arguments");
     } else {
-        let w = list.get(0).expect("write-string: wrong number of arguments");
+        let w = list.get(0).expect("write-string: wrong integer of arguments");
         if let Strings(s) = w {
             if list.len() == 1 {
                 std::io::stdout().write_all(s.as_bytes());
             } else if list.len() < 5 {
                 let mut start = 0;
                 let mut end = s.len();
-                let port = list.get(1).expect("write-string: wrong number of arguments");
+                let port = list.get(1).expect("write-string: wrong integer of arguments");
                 if list.len() >= 3 {
-                    if let Number(n) = list.get(2).expect("write-string: wrong number of arguments") {
-                        start = *n as usize;
-                    } else {
-                        panic!("write-string: not a number");
-                    }
+                    start = get_usize(list.get(2).expect("write-string: wrong integer of arguments")).expect("write-string: wrong integer of arguments");
+                   
                 }
                 if list.len() == 4 {
-                    if let Number(n) = list.get(3).expect("write-string: wrong number of arguments") {
-                        end = *n as usize;
-                        end = *n as usize;
-                    } else {
-                        panic!("write-string: not a number");
-                    }
+                    end = get_usize(list.get(3).expect("write-string: wrong integer of arguments")).expect("write-string: wrong integer of arguments");
                 }
                 let  str = &s[start..end];
               
@@ -66,7 +58,7 @@ fn write_string(apply_args: &mut ApplyArgs) -> LispType {
                     panic!("write-string: not a port");
                 }
             } else {
-                panic!("write-string: wrong number of arguments");
+                panic!("write-string: wrong integer of arguments");
             }
         } else {
             panic!("write-string: not a string");
@@ -78,20 +70,16 @@ fn write_string(apply_args: &mut ApplyArgs) -> LispType {
 fn write_byte_vector(apply_args: &mut ApplyArgs) -> LispType {
     let list = apply_args.args().data();
     if list.len() == 0 {
-        panic!("write-bytevector: wrong number of arguments");
+        panic!("write-bytevector: wrong integer of arguments");
     } else {
         // check bytes
-        let w = list.get(0).expect("write-bytevector: wrong number of arguments");
+        let w = list.get(0).expect("write-bytevector: wrong integer of arguments");
         if let Vector(vec, _) = w {
             let bytes = vec
                 .ref4read()
                 .iter()
                 .map(|x| {
-                    if let Number(n) = x {
-                        *n as u8
-                    } else {
-                        panic!("write-bytevector: not a byte");
-                    }
+                    get_int(x).expect("write-bytevector: not a integer") as u8
                 })
                 .collect::<Vec<u8>>();
             if list.len() == 1 {
@@ -99,20 +87,14 @@ fn write_byte_vector(apply_args: &mut ApplyArgs) -> LispType {
             } else if list.len() < 5 {
                 let mut start = 0;
                 let mut end = bytes.len();
-                let port = list.get(1).expect("write-bytevector: wrong number of arguments");
+                let port = list.get(1).expect("write-bytevector: wrong integer of arguments");
                 if list.len() >= 3 {
-                    if let Number(n) = list.get(2).expect("write-bytevector: wrong number of arguments") {
-                        start = *n as usize;
-                    } else {
-                        panic!("write-bytevector: not a number");
-                    }
+                    let v = list.get(2).expect("write-bytevector: wrong integer of arguments");
+                    start = get_usize(v).expect("write-bytevector: wrong integer of arguments");
                 }
                 if list.len() == 4 {
-                    if let Number(n) = list.get(3).expect("write-bytevector: wrong number of arguments") {
-                        end = *n as usize;
-                    } else {
-                        panic!("write-bytevector: not a number");
-                    }
+                    let v = list.get(3).expect("write-bytevector: wrong integer of arguments");
+                    end = get_usize(v).expect("write-bytevector: wrong integer of arguments");
                 }
                 let  bytes = &bytes[start..end];
                 if let Output(io) = port {
@@ -122,7 +104,7 @@ fn write_byte_vector(apply_args: &mut ApplyArgs) -> LispType {
                     panic!("write-string: not a port");
                 }
             } else {
-                panic!("write-bytevector: wrong number of arguments");
+                panic!("write-bytevector: wrong integer of arguments");
             }
         } else {
             panic!("write-bytevector: not a bytevector");
@@ -134,7 +116,7 @@ fn write_byte_vector(apply_args: &mut ApplyArgs) -> LispType {
 fn write_u8(apply_args: &mut ApplyArgs) -> LispType {
     let list = apply_args.args();
     if list.len() == 0 {
-        panic!("write-u8: wrong number of arguments");
+        panic!("write-u8: wrong integer of arguments");
     } else {
         let w = list.car();
         if let Byte(n) = w {
@@ -148,10 +130,10 @@ fn write_u8(apply_args: &mut ApplyArgs) -> LispType {
                     panic!("write-u8: not a port");
                 }
             } else {
-                panic!("write-u8: wrong number of arguments");
+                panic!("write-u8: wrong integer of arguments");
             }
         } else {
-            panic!("write-u8: not a number");
+            panic!("write-u8: not a integer");
         }
     }
     Nil
@@ -168,7 +150,7 @@ fn newline(apply_args: &mut ApplyArgs) -> LispType {
             panic!("newline: argument must be output stream");
         }
     } else {
-        panic!("newline: wrong number of arguments");
+        panic!("newline: wrong integer of arguments");
     }
     Nil
 }

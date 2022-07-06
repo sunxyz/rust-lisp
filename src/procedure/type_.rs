@@ -3,7 +3,7 @@ use super::*;
 fn get_type_name(apply_args: &mut ApplyArgs) -> LispType {
     let list = apply_args.args();
     if list.len() != 1 {
-        panic!("get-type-name: wrong number of arguments");
+        panic!("get-type-name: wrong integer of arguments");
     }
     let arg = list.car();
     Strings(get_type_name0(&arg))
@@ -12,7 +12,7 @@ fn get_type_name(apply_args: &mut ApplyArgs) -> LispType {
 fn is_type(apply_args: &mut ApplyArgs) -> LispType {
     let list = apply_args.args();
     if list.len() != 2 {
-        panic!("is-type?: wrong number of arguments");
+        panic!("is-type?: wrong integer of arguments");
     }
     let arg1 = list.car();
     let arg2 = list.cdr().car();
@@ -29,16 +29,18 @@ fn is_type(apply_args: &mut ApplyArgs) -> LispType {
 
 fn get_type_name0(arg: &LispType) -> String {
     let a = match arg {
-        Symbol(_) => "symbol",
-        Strings(_) => "string",
         Number(_) => "number",
         Boolean(_) => "boolean",
+        Symbol(_) => "symbol",
+        Strings(_) => "string",
+        Vector(_, _) => "vector",
         Procedure(_) => "procedure",
         Nil => "nil",
         Cons(_) => "cons",
-        Vector(_, _) => "vector",
-        Expr(_) => "expr",
-        _ => panic!("type: not a type"),
+        Expr(_) => "expression",
+        Input(_) => "input-port",
+        Output(_) => "output-port",
+        _ => "unknown",
     };
     a.to_string()
 }

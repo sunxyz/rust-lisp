@@ -34,7 +34,9 @@ mod os;
 
 
 use crate::env::{Env, EnvOps, RefEnv};
-use crate::types::{LispType::{self,*}, List, ApplyArgs, ref_::{self,*}, ProcedureBox, ConcurrencyBox};
+use crate::utils::num_utils::{get_int, get_float, get_usize};
+use crate::types::{LispType::{self,*}, List, ApplyArgs, ref_::{self,*}, ProcedureBox, ConcurrencyBox, NumberBox};
+
 
 trait ProcedureRegister {
     fn reg_procedure(&mut self, name: &str, proc: fn(&mut ApplyArgs) -> LispType);

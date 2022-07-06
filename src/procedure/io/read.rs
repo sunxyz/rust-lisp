@@ -20,7 +20,7 @@ fn read_char(apply_args: &mut ApplyArgs) -> LispType {
         }
         LispType::Char(v[0] as char)
     } else {
-        panic!("read-char: wrong number of arguments")
+        panic!("read-char: wrong integer of arguments")
     }
 }
 
@@ -40,7 +40,7 @@ fn read_line(apply_args: &mut ApplyArgs) -> LispType {
         }
         LispType::Strings(v)
     } else {
-        panic!("read-line: wrong number of arguments")
+        panic!("read-line: wrong integer of arguments")
     }
 }
 
@@ -59,7 +59,7 @@ fn read_string(apply_args: &mut ApplyArgs) -> LispType {
         }
         LispType::Strings(v)
     } else {
-        panic!("read-string: wrong number of arguments")
+        panic!("read-string: wrong integer of arguments")
     }
 }
 
@@ -68,7 +68,7 @@ fn read_u8(apply_args: &mut ApplyArgs) -> LispType {
     if list.len() == 0 {
         let mut v = [0u8; 1];
         std::io::stdin().read_exact(&mut v);
-        LispType::Number(v[0] as isize)
+        LispType::integer_of(v[0] as isize)
     } else if list.len() == 1 {
         let port = list.car();
         if let Input(io) = port {
@@ -79,7 +79,7 @@ fn read_u8(apply_args: &mut ApplyArgs) -> LispType {
             panic!("read-u8: not a port");
         }
     } else {
-        panic!("read-u8: wrong number of arguments")
+        panic!("read-u8: wrong integer of arguments")
     }
 }
 
@@ -87,11 +87,7 @@ fn read_byte_vector(apply_args: &mut ApplyArgs) -> LispType {
     let list = apply_args.args();
     if list.len() < 2 {
         let k = if list.len() == 1 {
-            if let Number(k) = list.car() {
-                k as usize
-            } else {
-                panic!("read-byte-vector: not a number");
-            }
+            get_usize(&list.car()).expect("read-byte-vector: not an integer")
         } else {
             1024
         };
@@ -102,9 +98,8 @@ fn read_byte_vector(apply_args: &mut ApplyArgs) -> LispType {
     } else if list.len() == 2 {
         let port = list.car();
         if let Input(io) = port {
-            if let Number(k) = list.cdr().car() {
-                let k = k as usize;
-                let mut v = vec![0u8; k];
+            let k =  get_usize(&list.cdr().car() ).expect("read-byte-vector: not a port");
+            let mut v = vec![0u8; k];
                 let buf = v.as_mut_slice();
                 // io.try_lock().expect("locked err").expect("io error").read_exact(&mut v);
                 io.lock().expect("locked err").read(buf);
@@ -113,14 +108,11 @@ fn read_byte_vector(apply_args: &mut ApplyArgs) -> LispType {
                     .map(|x| Byte(x.clone()))
                     .collect::<Vec<LispType>>();
                 return LispType::vector_of(vec);
-            } else {
-                panic!("read-byte-vector: not a port");
-            }
         } else {
-            panic!("read-byte-vector: wrong number of arguments")
+            panic!("read-byte-vector: wrong integer of arguments")
         }
     } else {
-        panic!("read-byte-vector: wrong number of arguments")
+        panic!("read-byte-vector: wrong integer of arguments")
     }
 }
 

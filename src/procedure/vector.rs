@@ -4,27 +4,20 @@ use std::cell::RefCell;
 fn make_vector(apply_args: &mut ApplyArgs) -> LispType {
     let mut vec = Vec::new();
     let list = apply_args.args();
-    let mut size = 0;
-    if (list.len() == 2) {
-        if let Number(s) = list.car() {
-            size = s.abs();
-            let v = list.cdr().car();
-            for i in 0..size {
-                vec.push(v.clone());
-            }
+    if (list.len() > 0) {
+        let size = get_usize(&list.car()).expect("make-vector: invalid argument");
+        let v = if list.len() > 1 {
+            list.cdr().car()
         } else {
-            panic!("make-vector: invalid argument");
-        }
-    } else if (list.len() == 1) {
-        if let Number(s) = list.car() {
-            size = s.abs();
-        } else {
-            panic!("make-vector: invalid argument");
+            Nil
+        };
+        for i in 0..size {
+            vec.push(v.clone());
         }
     } else {
-        panic!("make_vector: wrong number of arguments");
+        panic!("make_vector: wrong integer of arguments");
     }
-   LispType::vector_of(vec)
+    LispType::vector_of(vec)
 }
 
 fn vector(apply_args: &mut ApplyArgs) -> LispType {
@@ -44,7 +37,7 @@ fn is_vector(apply_args: &mut ApplyArgs) -> LispType {
 fn vector_eq(apply_args: &mut ApplyArgs) -> LispType {
     let list = apply_args.args();
     if (list.len() != 2) {
-        panic!("vector=?: wrong number of arguments");
+        panic!("vector=?: wrong integer of arguments");
     }
     let arg1 = list.car();
     let arg2 = list.cdr().car();
@@ -54,9 +47,9 @@ fn vector_eq(apply_args: &mut ApplyArgs) -> LispType {
 fn vector_length(apply_args: &mut ApplyArgs) -> LispType {
     let list = apply_args.args();
     if let Vector(v, s) = list.car() {
-        Number(s as isize)
-    }else {
-        Number(-1)
+        LispType::integer_of(s as isize)
+    } else {
+        LispType::integer_of(-1)
     }
 }
 
@@ -65,7 +58,7 @@ fn vector_ref(apply_args: &mut ApplyArgs) -> LispType {
     if (list.len() == 2) {
         if let Vector(l, s) = list.car() {
             let index = list.cdr().car();
-            if let Number(i) = index {
+            if let Number(NumberBox::Integer(i)) = index {
                 if i < 0 {
                     panic!("vector-ref: index out of range");
                 }
@@ -80,7 +73,7 @@ fn vector_ref(apply_args: &mut ApplyArgs) -> LispType {
             panic!("vector-ref: not a vector");
         }
     } else {
-        panic!("vector-ref: wrong number of arguments");
+        panic!("vector-ref: wrong integer of arguments");
     }
 }
 
@@ -89,7 +82,7 @@ fn vector_set(apply_args: &mut ApplyArgs) -> LispType {
     if (list.len() == 3) {
         if let Vector(l, s) = list.car() {
             let index = list.cdr().car();
-            if let Number(i) = index {
+            if let Number(NumberBox::Integer(i)) = index {
                 if i < 0 {
                     panic!("vector-set!: index out of range");
                 }
@@ -105,7 +98,7 @@ fn vector_set(apply_args: &mut ApplyArgs) -> LispType {
             panic!("vector-set!: not a vector");
         }
     } else {
-        panic!("vector-set!: wrong number of arguments");
+        panic!("vector-set!: wrong integer of arguments");
     }
 }
 
@@ -122,14 +115,14 @@ fn vector_fill(apply_args: &mut ApplyArgs) -> LispType {
             panic!("vector-fill!: not a vector");
         }
     } else {
-        panic!("vector-fill!: wrong number of arguments");
+        panic!("vector-fill!: wrong integer of arguments");
     }
 }
 
 fn vector2list(apply_args: &mut ApplyArgs) -> LispType {
     let list = apply_args.args();
     if (list.len() != 1) {
-        panic!("vector->list: wrong number of arguments");
+        panic!("vector->list: wrong integer of arguments");
     }
     if let Vector(l, s) = list.car() {
         let mut vec = Vec::new();

@@ -8,7 +8,7 @@ fn do_(apply_args: &mut ApplyArgs) -> LispType {
         panic!("do: too few arguments");
     }
     let var = list.car();
-    let test_exp = list.cdr().car();
+    let test_then_exp = list.cdr().car();
     let else_body = if (len > 2) {
         Expr(list.cdr().cdr())
     } else {
@@ -19,20 +19,21 @@ fn do_(apply_args: &mut ApplyArgs) -> LispType {
         // bind var to val
         var_bind(var0.clone(), apply_args);
         // println!("do: {}", var0);
-        loop {
-            if let Expr(l) = test_exp.clone() {
-                let test = l.car();
-                let body = l.cdr();
+
+        if let Expr(l) = test_then_exp {
+            let test = l.car();
+            let then_body = if l.len() > 1 { Expr(l.cdr()) } else { Nil };
+            loop {
                 let test = apply_args.inter(&test);
                 // println!("do: {} body: {}", test, body);
                 if is_true(&test) {
-                    return apply_args.inter(&Expr(body));
+                    return apply_args.inter(&then_body);
                 }
                 apply_args.inter(&else_body);
                 var_update(var0.clone(), apply_args);
-            } else {
-                panic!("do: test expression must be a list");
             }
+        } else {
+            panic!("do: test expression must be a list");
         }
     } else {
         panic!("do: variable must be a symbol");
@@ -81,19 +82,19 @@ fn var_update(vars: List, apply_args: &mut ApplyArgs) {
 
 fn while_fn(apply_args: &mut ApplyArgs) -> LispType {
     let list = apply_args.expr();
-    let len = list.len();
-    if (len < 2) {
+    if (list.len() < 2) {
         panic!("while: too few arguments");
     }
     let test_exp = list.car();
     let body = Expr(list.cdr());
     let apply_args = &mut apply_args.fork_env();
+    let mut res = Nil;
     loop {
         let test = apply_args.inter(&test_exp);
         if is_true(&test) {
-             apply_args.inter(&body);
-        }else{
-           return apply_args.inter(&body);
+            res=apply_args.inter(&body);
+        } else {
+            return res;
         }
     }
 }

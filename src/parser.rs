@@ -111,8 +111,10 @@ fn parse_atom(s: &str) -> Result<LispType, String> {
             } else if s.starts_with("\\#") && s.len() > 2 {
                 LispType::Char(s.chars().nth(2).unwrap())
             } else if s.parse::<isize>().is_ok() {
-                LispType::Number(s.parse::<isize>().unwrap())
-            } else if s.starts_with(",@") {
+                LispType::integer_of(s.parse::<isize>().unwrap())
+            }else if s.parse::<f64>().is_ok() {
+                LispType::float_of(s.parse::<f64>().unwrap())
+            }  else if s.starts_with(",@") {
                 if (s.len() > 2) {
                     LispType::expr_of(vec![
                         LispType::Symbol(",@".to_string()),

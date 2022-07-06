@@ -3,11 +3,7 @@ use super::*;
 fn make_barrier(apply_args: &mut ApplyArgs) -> LispType {
     apply_args.check_args_num(1);
     let car = apply_args.args().car();
-    if let Number(size) = car {
-        LispType::concurrency_barrier_of(size as usize)
-    } else {
-        panic!("make-barrier: not a number");
-    }
+    LispType::concurrency_barrier_of(get_usize(&car).expect("make-barrier: invalid argument"))
 }
 
 fn barrier_wait(apply_args: &mut ApplyArgs) -> LispType {
