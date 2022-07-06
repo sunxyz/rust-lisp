@@ -3,7 +3,7 @@
 **lisp(Scheme) interpreter for rust**
 
 ## Implemented procedure (method)
-* [x] number procedure (+ - * / < <= > >= = number? number=? number->string number->char)
+* [x] number procedure (+ - * / < <= > >= = integer? float? number? integer=? float=? number=? float->integer float->string integer->float integer->string integer->char)
 * [x] boolean operation (and or not)
 * [x] byte byte-vector->string
 * [x] char procedure (char? char=? char->number)
@@ -29,7 +29,7 @@
 * [x] eval
 * [x] lazy evaluation (delay promise? force)
 * [x] io (file io | socket(net) io | console io) support (display newline call-with-tcp-listener call-with-input-file  call-with-output-file open-input-file  open-output-file input-port? output-port? port? read-char read-line read-string read-u8 read-byte-vector write-char write-string write-byte-vector write-u8)
-* [x] concurrency (async await | thread ) support (thread-run sleep make-lock lock-exp  make-barrier barrier-wait make-channel channel-send:(-> chan x) channel-done channel-recv:(<- chan) channel-for-each :(<-for-each fn chan) channel-map:(<-- fn chan)
+* [x] concurrency (async await | thread ) support (thread-run join sleep make-lock lock-exp  make-barrier barrier-wait make-channel channel-send:(-> chan x) channel-done channel-recv:(<- chan) channel-for-each :(<-for-each fn chan) channel-map:(<-- fn chan)
 * [ ] more can be implemented through macros 
 
 ## use
@@ -87,4 +87,54 @@ or
         (display x)
         (newline)
     )) chan))
+```
+**web-sample**
+* async.lisp
+```
+(
+    (define thread-qty (* (get-os-cpu-num) 2))
+    (define barrier (make-barrier thread-qty))
+    (define channel (make-channel))
+    (do ((index 0 (+ 1 index)))
+        ((= index thread-qty) nil) 
+        (thread-run (lambda ()(
+            (channel-for-each (lambda (task) (
+                (task)
+            )) channel)
+            (barrier-wait barrier)
+            ))))
+    (def go (task) (
+      -> task channel
+    ))
+    (export go)
+)
+```
+* web-sample.lisp
+```
+(
+    (def handler (in out) (
+        ;; (sleep 1)
+        (println (current-thread-name))
+        (display  (read-line in))
+        (write-string "HTTP/1.1 200 OK\r\n\r\n hello word" out )
+    ))
+    (def tcp-listener (port) (
+        (println "tcp-listener: port: " port)
+        (call-with-tcp-listener (string-append "127.0.0.1:" port) ( lambda (in out) (
+            (go (lambda () (
+                handler in out
+            )))
+        )))
+    ))
+)
+```
+* main.lisp
+
+```
+(
+    (load "./lib.lisp")
+    (import (go) from "./async.lisp")
+    (import (tcp-listener) from "./web-sample.lisp")
+    (tcp-listener 8088)
+)
 ```
