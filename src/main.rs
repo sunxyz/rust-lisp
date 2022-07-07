@@ -84,13 +84,13 @@ fn cmd_handler() {
         if (expr_str.trim() == ":exit") {
             break;
         } else if (expr_str.trim() == ":save") {
-            save_file(&format!("(\n{})",exprs));
+            save_file(&format!("({}\n)",exprs));
             continue;
         } else if (!expr_str.trim().starts_with("(")) {
             expr_str = format!("({})", expr_str);
         }
+        exprs.push_str("\n\t");
         exprs.push_str(&expr_str);
-        exprs.push_str("\n");
         let exp = parser(expr_str.clone()).expect("parser error");
         let r = interpreter(exp, env.clone());
         if let Nil = r {

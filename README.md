@@ -51,6 +51,25 @@ or
 ```
 ./rust-lisp 
 ```
+console 
+```
+--------------------------
+ welcome rust-lisp v0.1.0 
+-------------------------- 
+ source code:https://github.com/sunxyz/rust-lisp 
+
+> + 1 2 3 \
+4 5 6
+21
+> :save
+please input the file name:
+./sample.lisp
+ save file success
+> call-with-input-file "./sample.lisp" read-string
+(
+    (+ 1 2 3 4 5 6)
+) 
+```
 
 ## lisp sample
 
