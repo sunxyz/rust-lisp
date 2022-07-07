@@ -24,16 +24,21 @@ use parser::parser;
 use std::{
     env as std_env,
     io::{self, Read, Write},
+    ops::Add,
 };
-use types::{LispType::{self,Nil}, ApplyArgs, RefOps};
+use types::{
+    ApplyArgs,
+    LispType::{self, Nil},
+    RefOps,
+};
 
-
+use crate::types::List;
 
 fn main() {
     args_handler();
 }
 
-fn args_handler(){
+fn args_handler() {
     let args: Vec<String> = std_env::args().collect();
     // println!("{:?}", args);
 
@@ -57,27 +62,57 @@ fn args_handler(){
 }
 
 fn cmd_handler() {
-
     let root = Env::root();
-    procedure::init_procedure( &mut root.ref4write());
-    let env = Env::extend( root);
+    procedure::init_procedure(&mut root.ref4write());
+    let env = Env::extend(root);
     println!("\n\x1b[34m--------------------------\n welcome rust-lisp v0.1.0 \n--------------------------\x1b[0m \n \x1b[30msource code:https://github.com/sunxyz/rust-lisp \x1b[0m\n");
     let mut line = String::new();
+    let mut expr_str = String::new();
+    let mut exprs = String::new();
+
     loop {
-        line.clear();
-        print!("> ");
-        std::io::stdout().flush();
-        std::io::stdin().read_line(&mut line).unwrap();
-        if(line.trim() == "exit") {
-            break;
-        }else if(!line.trim().starts_with("(")) {
-            line = format!("({})", line);
+        expr_str.clear();
+        print!("\x1b[32m>\x1b[0m ");
+        read_line(&mut line);
+        while line.ends_with("\\") {
+            expr_str.push_str(&line[..line.len() - 1]);
+            read_line(&mut line);
         }
-        let exp = parser(line.clone()).expect("parser error");
+        if !line.ends_with("\\") {
+            expr_str.push_str(&line);
+        }
+        if (expr_str.trim() == ":exit") {
+            break;
+        } else if (expr_str.trim() == ":save") {
+            save_file(&format!("(\n{})",exprs));
+            continue;
+        } else if (!expr_str.trim().starts_with("(")) {
+            expr_str = format!("({})", expr_str);
+        }
+        exprs.push_str(&expr_str);
+        exprs.push_str("\n");
+        let exp = parser(expr_str.clone()).expect("parser error");
         let r = interpreter(exp, env.clone());
         if let Nil = r {
         } else {
             println!("{}", r);
         }
     }
+}
+
+fn read_line(line: &mut String) {
+    line.clear();
+    std::io::stdout().flush();
+    std::io::stdin().read_line(line).unwrap();
+    line.remove(line.len() - 1);
+}
+
+fn save_file(expr: &String) {
+    println!("please input the file name:");
+    let mut filename = String::new();
+    read_line(&mut filename);
+    let filename = filename.trim();
+    let mut file = std::fs::File::create(filename).expect("create file failed");
+    file.write_all(expr.to_string().as_bytes()).expect("save file failed");
+    println!("\x1b[32m save file success\x1b[0m ");
 }
