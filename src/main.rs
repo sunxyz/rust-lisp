@@ -81,7 +81,8 @@ fn cmd_handler() {
         if !line.ends_with("\\") {
             expr_str.push_str(&line);
         }
-        if (expr_str.trim() == ":exit") {
+        if (expr_str.trim() == ":quit") {
+            println!("\x1b[32m good bye! \x1b[0m ");
             break;
         } else if (expr_str.trim() == ":save") {
             save_file(&format!("({}\n)",exprs));
