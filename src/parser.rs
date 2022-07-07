@@ -5,14 +5,14 @@ use super::types::*;
 static PREFIX: &'static str = "(";
 static SUFFIX: &'static str = ")";
 
-pub fn parser(exp: String) -> Result<List, String> {
-    Ok(parse0(exp.replace("\"", "'")))
+pub fn parser(expr: String) -> Result<List, String> {
+    Ok(parse0(expr.replace("\"", "'")))
 }
 
-fn parse0(exp: String) -> List {
+fn parse0(expr: String) -> List {
     let mut stack = Vec::new();
     let mut next = true;
-    let mut exp = exp.as_str();
+    let mut exp = expr.as_str();
     while next {
         exp = exp.trim();
         let is_push = exp.starts_with(PREFIX);
