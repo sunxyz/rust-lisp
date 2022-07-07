@@ -69,6 +69,8 @@ please input the file name:
 (
     (+ 1 2 3 4 5 6)
 ) 
+> load "./sample.lisp"
+21
 > :quit
  good bye!
 ```
