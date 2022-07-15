@@ -72,6 +72,9 @@ please input the file name:
 > :quit
  good bye!
 ```
+## download rust-lisp
+
+[liunx_x86：rust-lisp](https://github.com/sunxyz/rust-lisp/blob/main/file/rust-lisp)
 
 ## lisp sample
 
