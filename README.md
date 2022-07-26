@@ -76,8 +76,9 @@ please input the file name:
 ```
 ## download rust-lisp
 
-[liunx_x86_rust-lisp](https://github.com/sunxyz/rust-lisp/blob/main/file/rust-lisp)
-[windows_x86_rust-lisp](https://github.com/sunxyz/rust-lisp/blob/main/file/rust-lisp.exe)
+- [liunx_x86_rust-lisp](https://github.com/sunxyz/rust-lisp/blob/main/file/rust-lisp)
+
+- [windows_x86_rust-lisp](https://github.com/sunxyz/rust-lisp/blob/main/file/rust-lisp.exe)
 
 ## lisp sample
 
